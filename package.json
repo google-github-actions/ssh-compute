@@ -1,0 +1,66 @@
+{
+  "name": "ssh-compute",
+  "version": "0.1.0",
+  "description": "Github Action: Connect to GCP instances via SSH",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/index.ts",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "format": "prettier --write **/*.ts",
+    "test": "mocha -r ts-node/register -t 150s 'tests/unit/*.test.ts' --exit",
+    "e2e-tests": "mocha -r ts-node/register -t 150s 'tests/e2e.test.ts' --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google-github-actions/ssh-compute.git"
+  },
+  "keywords": [
+    "actions",
+    "google",
+    "ssh compute",
+    "compute",
+    "ssh"
+  ],
+  "author": "Google LLC",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/google-github-actions/ssh-compute/issues"
+  },
+  "homepage": "https://github.com/google-github-actions/ssh-compute#readme",
+  "dependencies": {
+    "@actions/core": "^1.5.0",
+    "@actions/exec": "^1.1.0",
+    "@actions/tool-cache": "^1.7.1",
+    "@google-github-actions/setup-cloud-sdk": "^0.1.1",
+    "@lifeomic/attempt": "^3.0.0",
+    "@types/tmp": "^0.2.1",
+    "fs": "0.0.2",
+    "google-auth-library": "^7.6.2",
+    "googleapis": "^85.0.0",
+    "tmp": "^0.2.1",
+    "typed-rest-client": "^1.8.5",
+    "yaml": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.21",
+    "@types/js-yaml": "^4.0.3",
+    "@types/lodash": "^4.14.172",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.7.13",
+    "@types/sinon": "^10.0.2",
+    "@types/uuid": "^8.3.1",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "@zeit/ncc": "^0.22.3",
+    "chai": "^4.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "lodash": "^4.17.21",
+    "mocha": "^9.1.1",
+    "prettier": "^2.3.2",
+    "sinon": "^11.1.2",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.3.5"
+  }
+}
