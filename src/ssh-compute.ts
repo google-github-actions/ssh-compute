@@ -43,8 +43,7 @@ export async function run(): Promise<void> {
     const sshKeyFile = core.getInput('ssh_key_file');
     const sshKeyExpireAfter = core.getInput('ssh_key_expire_after')
     const sshArgs = core.getInput('ssh_args');
-    let command = core.getInput('command');
-    const entrypoint = core.getInput('entrypoint');
+    const command = core.getInput('command');
     const credentials = core.getInput('credentials');
     let projectId = core.getInput('project_id');
     let gcloudVersion = core.getInput('gcloud_version');
@@ -56,21 +55,10 @@ export async function run(): Promise<void> {
     const installBeta = false; // Flag for installing gcloud beta components
     let cmd;
   
-    // Throw errors if inputs aren't valid
-    if (command && entrypoint) {
-      throw new Error(
-        'Both `command` and `entrypoint` inputs set - Please select one.',
-      );
-    }
-
     if (internalIp && tunnelThroughIap) {
       throw new Error(
         'Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.',
       );
-    }
-
-    if (entrypoint) {
-      command = `bash ${entrypoint}`;
     }
 
     if (user) {
@@ -84,8 +72,6 @@ export async function run(): Promise<void> {
       '--zone',
       zone,
       '--quiet', // we need to ignore promts from console
-      '--command',
-      `'${command}'`,
     ];
 
     if (container) {
@@ -175,17 +161,18 @@ export async function run(): Promise<void> {
       },
       silent: true,
     };
-    core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
     // Run gcloud cmd.
     try {
-      const sshKeyEndCommand = '+----[SHA256]-----+\n';
-
-      await exec.exec(toolCommand, cmd, options);
-      if (output.includes(sshKeyEndCommand)) {
-        core.setOutput('stdout', output.split(sshKeyEndCommand).pop());
-      } else {
-        core.setOutput('stdout', output);
+      if (!sshKeyFile) {
+        // we should generate ssh keys first
+        const doNothingCommand = [...cmd, '--command', `'exit 0'`];
+        core.info(`running: ${toolCommand} ${doNothingCommand.join(' ')}`);
+        await exec.exec(toolCommand, doNothingCommand, {silent: true});
       }
+      cmd = [...cmd, '--command', `'${command}'`];
+      core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
+      await exec.exec(toolCommand, cmd, options);
+      core.setOutput('stdout', output);
       core.setOutput('stderr', errOutput);
     } catch (error: any) {
       if (errOutput) {

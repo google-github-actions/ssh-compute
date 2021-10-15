@@ -74,12 +74,6 @@ inputs:
       Action runs the command on the target instance and then exits.
     required: false
 
-  entrypoint:
-    description: |-
-      Path to a bash script to run on the virtual machine.
-      Action runs the script on the target instance and then exits.
-    required: false
-
   project_id:
     description: The GCP project ID. Overrides project ID set by credentials.
     required: false
