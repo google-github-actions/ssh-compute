@@ -19,6 +19,7 @@ import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 import path from 'path';
+import fs from 'fs';
 
 export const GCLOUD_METRICS_ENV_VAR = 'CLOUDSDK_METRICS_ENVIRONMENT';
 export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
@@ -40,13 +41,15 @@ export async function run(): Promise<void> {
     const zone = core.getInput('zone');
     const user = core.getInput('user');
     const container = core.getInput('container');
-    const sshKeyFile = core.getInput('ssh_key_file');
-    const sshKeyExpireAfter = core.getInput('ssh_key_expire_after')
+    const sshKeyFilePath = core.getInput('ssh_key_file_path') || '/home/runner/.ssh/google_compute_engine';
+    const sshKeyExpireAfter = core.getInput('ssh_key_expire_after');
     const sshArgs = core.getInput('ssh_args');
-    const command = core.getInput('command');
+    let command = core.getInput('command');
+    const entrypoint = core.getInput('entrypoint');
     const credentials = core.getInput('credentials');
     let projectId = core.getInput('project_id');
     let gcloudVersion = core.getInput('gcloud_version');
+    const generateSshKeys = core.getInput('generate_ssh_keys');
   
     // Flags
     const internalIp = core.getInput('internal_ip');
@@ -54,6 +57,12 @@ export async function run(): Promise<void> {
     const flags = core.getInput('flags');
     const installBeta = false; // Flag for installing gcloud beta components
     let cmd;
+
+    if (command && entrypoint) {
+      throw new Error(
+        'Both `command` and `entrypoint` inputs set - Please select one.',
+      );
+    }
   
     if (internalIp && tunnelThroughIap) {
       throw new Error(
@@ -78,8 +87,8 @@ export async function run(): Promise<void> {
       cmd.push('--container', container);
     }
 
-    if (sshKeyFile) {
-      cmd.push('--ssh-key-file', sshKeyFile);
+    if (sshKeyFilePath) {
+      cmd.push('--ssh-key-file', sshKeyFilePath);
     }
 
     if (sshKeyExpireAfter) {
@@ -99,8 +108,21 @@ export async function run(): Promise<void> {
       if (flagList) cmd = cmd.concat(flagList);
     }
 
+    if (entrypoint) {
+      if (!fs.existsSync(entrypoint)) {
+        core.error(`${entrypoint} does not exist.`);
+        const message =
+          'Entrypoint can not be found. ' +
+          'Check entrypoint input path.';
+        throw new Error(message);
+      }
+
+      const commandData = fs.readFileSync(entrypoint).toString('utf8');
+      command = `bash -c \"${commandData}\"`;
+    }
+
     if (sshArgs) {
-      cmd.push('--', sshArgs);
+      cmd.push(`-- ${sshArgs}`);
     }
 
     // Install gcloud if not already installed.
@@ -163,13 +185,18 @@ export async function run(): Promise<void> {
     };
     // Run gcloud cmd.
     try {
-      if (!sshKeyFile) {
-        // we should generate ssh keys first
-        const doNothingCommand = [...cmd, '--command', `'echo 0'`];
-        core.info(`running: ${toolCommand} ${doNothingCommand.join(' ')}`);
-        await exec.exec(toolCommand, doNothingCommand, options);
+      if (generateSshKeys) {
+        // we should generate ssh keys and update metadata first (executing empty command)
+        const doNothingCommand = [...cmd, '--command', 'exit 0'];
+        await exec.exec(toolCommand, doNothingCommand);
       }
-      cmd = [...cmd, '--command', `'${command}'`];
+
+      if (!fs.existsSync(sshKeyFilePath)) {
+        throw new Error(
+          `${sshKeyFilePath} does not exist. Provide correct ssh keys.`,
+        );
+      }
+      cmd = [...cmd, '--command', `${command}`];
       core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
       await exec.exec(toolCommand, cmd, options);
       core.setOutput('stdout', output);

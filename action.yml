@@ -41,9 +41,9 @@ inputs:
       virtual machine image.
     required: false
 
-  ssh_key_file:
+  ssh_key_file_path:
     description: |-
-      The path to the SSH key file. By default, this is '~/.ssh/google_compute_engine'
+      Absolute path to the SSH key file. By default, this is '/home/runner/.ssh/google_compute_engine'.
     required: false
 
   ssh_key_expire_after:
@@ -53,7 +53,7 @@ inputs:
 
   ssh_args:
     description: |-
-      Additional flags to be passed to ssh tool. Example: '-vvv -L 80:%INSTANCE%:80'
+      Additional flags to be passed to ssh tool. Example: '-vvv -L 80:%INSTANCE%:80'.
     required: false
 
   internal_ip:
@@ -72,6 +72,18 @@ inputs:
     description: |-
       A command to run on the virtual machine.
       Action runs the command on the target instance and then exits.
+    required: false
+
+  entrypoint:
+    description: |-
+      A path for bash script to run on the virtual machine.
+      Action runs the file on the target instance and then exits.
+    required: false
+
+  generate_ssh_keys:
+    description: |-
+      If flag is set and SSH keys aren't provided, 
+      then SSH keygen will be executed to generate the keys.
     required: false
 
   project_id:
