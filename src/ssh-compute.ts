@@ -165,9 +165,9 @@ export async function run(): Promise<void> {
     try {
       if (!sshKeyFile) {
         // we should generate ssh keys first
-        const doNothingCommand = [...cmd, '--command', `'exit 0'`];
+        const doNothingCommand = [...cmd, '--command', `'echo 0'`];
         core.info(`running: ${toolCommand} ${doNothingCommand.join(' ')}`);
-        await exec.exec(toolCommand, doNothingCommand, {silent: true});
+        await exec.exec(toolCommand, doNothingCommand, options);
       }
       cmd = [...cmd, '--command', `'${command}'`];
       core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
