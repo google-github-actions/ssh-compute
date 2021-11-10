@@ -12368,7 +12368,7 @@ module.exports = require("crypto");
 "use strict";
 
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12454,7 +12454,7 @@ function run() {
             const internalIp = core.getInput('internal_ip');
             const tunnelThroughIap = core.getInput('tunnel_through_iap');
             const flags = core.getInput('flags');
-            const installBeta = false; // Flag for installing gcloud beta components
+            const installBeta = true; // Flag for installing gcloud beta components
             let cmd;
             if (command && entrypoint) {
                 throw new Error('Both `command` and `entrypoint` inputs set - Please select one.');
@@ -12495,7 +12495,6 @@ function run() {
             }
             if (entrypoint) {
                 if (!fs_1.default.existsSync(entrypoint)) {
-                    core.error(`${entrypoint} does not exist.`);
                     const message = 'Entrypoint can not be found. ' +
                         'Check entrypoint input path.';
                     throw new Error(message);

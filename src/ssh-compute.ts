@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ export async function run(): Promise<void> {
     const internalIp = core.getInput('internal_ip');
     const tunnelThroughIap = core.getInput('tunnel_through_iap');
     const flags = core.getInput('flags');
-    const installBeta = false; // Flag for installing gcloud beta components
+    const installBeta = true; // Flag for installing gcloud beta components
     let cmd;
 
     if (command && entrypoint) {
@@ -110,7 +110,6 @@ export async function run(): Promise<void> {
 
     if (entrypoint) {
       if (!fs.existsSync(entrypoint)) {
-        core.error(`${entrypoint} does not exist.`);
         const message =
           'Entrypoint can not be found. ' +
           'Check entrypoint input path.';

@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ inputs:
 
   user:
     description: |-
-      Username with which to SSH. If omitted, the user login name is used. 
+      Username with which to SSH. If omitted, the user login name is used.
+      GH action runner uses 'runner' as a default name.
       If using OS Login, USER will be replaced by the OS Login user.
     required: false
 
