@@ -42,32 +42,22 @@ inputs:
       virtual machine image.
     required: false
 
-  ssh_key_file_path:
-    description: |-
-      Absolute path to the SSH key file. By default, this is '/home/runner/.ssh/google_compute_engine'.
-    required: false
-
-  ssh_key_expire_after:
-    description: |-
-      The maximum length of time an SSH key is valid for once created and installed, e.g. 2m for 2 minutes.
-    required: false
-
   ssh_args:
     description: |-
       Additional flags to be passed to ssh tool. Example: '-vvv -L 80:%INSTANCE%:80'.
     required: false
 
-  internal_ip:
-    description: |-
-      Connect to instances using their internal IP addresses rather than their external IP addresses.
-      Use this to connect from one instance to another on the same VPC network, over a VPN connection,
-      or between two peered VPC networks.
-    required: false
+  # internal_ip:
+  #   description: |-
+  #     Connect to instances using their internal IP addresses rather than their external IP addresses.
+  #     Use this to connect from one instance to another on the same VPC network, over a VPN connection,
+  #     or between two peered VPC networks.
+  #   required: false
 
-  tunnel_through_iap:
-    description: |-
-      Tunnel the ssh connection through Cloud Identity-Aware Proxy for TCP forwarding.
-    required: false
+  # tunnel_through_iap:
+  #   description: |-
+  #     Tunnel the ssh connection through Cloud Identity-Aware Proxy for TCP forwarding.
+  #   required: false
 
   command:
     description: |-
@@ -75,28 +65,14 @@ inputs:
       Action runs the command on the target instance and then exits.
     required: false
 
-  entrypoint:
+  script:
     description: |-
-      A path for bash script to run on the virtual machine.
+      A path for a bash script to run on the virtual machine.
       Action runs the file on the target instance and then exits.
-    required: false
-
-  generate_ssh_keys:
-    description: |-
-      If flag is set and SSH keys aren't provided, 
-      then SSH keygen will be executed to generate the keys.
     required: false
 
   project_id:
     description: The GCP project ID. Overrides project ID set by credentials.
-    required: false
-
-  credentials:
-    description: |-
-      Service account key to use for authentication. This should be the JSON
-      formatted private key which can be exported from the Cloud Console. The
-      value can be raw or base64-encoded. Required if not using a the
-      setup-gcloud action with exported credentials.
     required: false
 
   flags:

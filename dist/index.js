@@ -1054,7 +1054,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
-const os = __importStar(__nccwpck_require__(2087));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 /**
  * Commands
@@ -1165,8 +1165,8 @@ exports.getIDToken = exports.getState = exports.saveState = exports.group = expo
 const command_1 = __nccwpck_require__(5241);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(5278);
-const os = __importStar(__nccwpck_require__(2087));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 const oidc_utils_1 = __nccwpck_require__(8041);
 /**
  * The code to exit an action
@@ -1475,8 +1475,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__nccwpck_require__(5747));
-const os = __importStar(__nccwpck_require__(2087));
+const fs = __importStar(__nccwpck_require__(7147));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -1661,7 +1661,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getExecOutput = exports.exec = void 0;
-const string_decoder_1 = __nccwpck_require__(4304);
+const string_decoder_1 = __nccwpck_require__(1576);
 const tr = __importStar(__nccwpck_require__(8159));
 /**
  * Exec a command.
@@ -1771,13 +1771,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.argStringToArray = exports.ToolRunner = void 0;
-const os = __importStar(__nccwpck_require__(2087));
-const events = __importStar(__nccwpck_require__(8614));
-const child = __importStar(__nccwpck_require__(3129));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const events = __importStar(__nccwpck_require__(2361));
+const child = __importStar(__nccwpck_require__(2081));
+const path = __importStar(__nccwpck_require__(1017));
 const io = __importStar(__nccwpck_require__(7351));
 const ioUtil = __importStar(__nccwpck_require__(1962));
-const timers_1 = __nccwpck_require__(8213);
+const timers_1 = __nccwpck_require__(9512);
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
 /*
@@ -2433,8 +2433,8 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const http = __nccwpck_require__(8605);
-const https = __nccwpck_require__(7211);
+const http = __nccwpck_require__(3685);
+const https = __nccwpck_require__(5687);
 const pm = __nccwpck_require__(6443);
 let tunnel;
 var HttpCodes;
@@ -3073,8 +3073,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-const fs = __importStar(__nccwpck_require__(5747));
-const path = __importStar(__nccwpck_require__(5622));
+const fs = __importStar(__nccwpck_require__(7147));
+const path = __importStar(__nccwpck_require__(1017));
 _a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
 exports.IS_WINDOWS = process.platform === 'win32';
 function exists(fsPath) {
@@ -3256,10 +3256,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
-const assert_1 = __nccwpck_require__(2357);
-const childProcess = __importStar(__nccwpck_require__(3129));
-const path = __importStar(__nccwpck_require__(5622));
-const util_1 = __nccwpck_require__(1669);
+const assert_1 = __nccwpck_require__(9491);
+const childProcess = __importStar(__nccwpck_require__(2081));
+const path = __importStar(__nccwpck_require__(1017));
+const util_1 = __nccwpck_require__(3837);
 const ioUtil = __importStar(__nccwpck_require__(1962));
 const exec = util_1.promisify(childProcess.exec);
 const execFile = util_1.promisify(childProcess.execFile);
@@ -3608,9 +3608,9 @@ const semver = __importStar(__nccwpck_require__(5911));
 const core_1 = __nccwpck_require__(2186);
 // needs to be require for core node modules to be mocked
 /* eslint @typescript-eslint/no-require-imports: 0 */
-const os = __nccwpck_require__(2087);
-const cp = __nccwpck_require__(3129);
-const fs = __nccwpck_require__(5747);
+const os = __nccwpck_require__(2037);
+const cp = __nccwpck_require__(2081);
+const fs = __nccwpck_require__(7147);
 function _findMatch(versionSpec, stable, candidates, archFilter) {
     return __awaiter(this, void 0, void 0, function* () {
         const platFilter = os.platform();
@@ -3834,17 +3834,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.evaluateVersions = exports.isExplicitVersion = exports.findFromManifest = exports.getManifestFromRepo = exports.findAllVersions = exports.find = exports.cacheFile = exports.cacheDir = exports.extractZip = exports.extractXar = exports.extractTar = exports.extract7z = exports.downloadTool = exports.HTTPError = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const io = __importStar(__nccwpck_require__(7351));
-const fs = __importStar(__nccwpck_require__(5747));
+const fs = __importStar(__nccwpck_require__(7147));
 const mm = __importStar(__nccwpck_require__(2473));
-const os = __importStar(__nccwpck_require__(2087));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 const httpm = __importStar(__nccwpck_require__(9925));
 const semver = __importStar(__nccwpck_require__(5911));
-const stream = __importStar(__nccwpck_require__(2413));
-const util = __importStar(__nccwpck_require__(1669));
-const v4_1 = __importDefault(__nccwpck_require__(824));
+const stream = __importStar(__nccwpck_require__(2781));
+const util = __importStar(__nccwpck_require__(3837));
+const v4_1 = __importDefault(__nccwpck_require__(7468));
 const exec_1 = __nccwpck_require__(1514);
-const assert_1 = __nccwpck_require__(2357);
+const assert_1 = __nccwpck_require__(9491);
 const retry_helper_1 = __nccwpck_require__(8279);
 class HTTPError extends Error {
     constructor(httpStatusCode) {
@@ -4466,7 +4466,91 @@ function _unique(values) {
 
 /***/ }),
 
-/***/ 6449:
+/***/ 7701:
+/***/ ((module) => {
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]]
+  ]).join('');
+}
+
+module.exports = bytesToUuid;
+
+
+/***/ }),
+
+/***/ 7269:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// Unique ID creation requires a high quality random # generator.  In node.js
+// this is pretty straight-forward - we use the crypto API.
+
+var crypto = __nccwpck_require__(6113);
+
+module.exports = function nodeRNG() {
+  return crypto.randomBytes(16);
+};
+
+
+/***/ }),
+
+/***/ 7468:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var rng = __nccwpck_require__(7269);
+var bytesToUuid = __nccwpck_require__(7701);
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid(rnds);
+}
+
+module.exports = v4;
+
+
+/***/ }),
+
+/***/ 6494:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4562,7 +4646,7 @@ async function retry(attemptFunc, attemptOptions) {
         }
         const onError = async (err) => {
             if (options.handleError) {
-                options.handleError(err, context, options);
+                await options.handleError(err, context, options);
             }
             if (context.aborted || (context.attemptsRemaining === 0)) {
                 throw err;
@@ -4582,7 +4666,14 @@ async function retry(attemptFunc, attemptOptions) {
             return new Promise((resolve, reject) => {
                 const timer = setTimeout(() => {
                     if (options.handleTimeout) {
-                        resolve(options.handleTimeout(context, options));
+                        // If calling handleTimeout throws an error that is not wrapped in a promise
+                        // we want to catch the error and reject.
+                        try {
+                            resolve(options.handleTimeout(context, options));
+                        }
+                        catch (e) {
+                            reject(e);
+                        }
                     }
                     else {
                         const err = new Error(`Retry timeout (attemptNum: ${context.attemptNum}, timeout: ${options.timeout})`);
@@ -5226,7 +5317,7 @@ var gPO = (typeof Reflect === 'function' ? Reflect.getPrototypeOf : Object.getPr
         : null
 );
 
-var inspectCustom = __nccwpck_require__(7265).custom;
+var inspectCustom = (__nccwpck_require__(7265).custom);
 var inspectSymbol = inspectCustom && isSymbol(inspectCustom) ? inspectCustom : null;
 var toStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag !== 'undefined' ? Symbol.toStringTag : null;
 
@@ -5669,7 +5760,7 @@ function arrObjKeys(obj, inspect) {
 /***/ 7265:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-module.exports = __nccwpck_require__(1669).inspect;
+module.exports = __nccwpck_require__(3837).inspect;
 
 
 /***/ }),
@@ -8301,13 +8392,13 @@ module.exports = __nccwpck_require__(4219);
 "use strict";
 
 
-var net = __nccwpck_require__(1631);
-var tls = __nccwpck_require__(4016);
-var http = __nccwpck_require__(8605);
-var https = __nccwpck_require__(7211);
-var events = __nccwpck_require__(8614);
-var assert = __nccwpck_require__(2357);
-var util = __nccwpck_require__(1669);
+var net = __nccwpck_require__(1808);
+var tls = __nccwpck_require__(4404);
+var http = __nccwpck_require__(3685);
+var https = __nccwpck_require__(5687);
+var events = __nccwpck_require__(2361);
+var assert = __nccwpck_require__(9491);
+var util = __nccwpck_require__(3837);
 
 
 exports.httpOverHttp = httpOverHttp;
@@ -8583,9 +8674,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const url = __nccwpck_require__(8835);
-const http = __nccwpck_require__(8605);
-const https = __nccwpck_require__(7211);
+const url = __nccwpck_require__(7310);
+const http = __nccwpck_require__(3685);
+const https = __nccwpck_require__(5687);
 const util = __nccwpck_require__(9470);
 let fs;
 let tunnel;
@@ -8703,7 +8794,7 @@ class HttpClient {
             this._certConfig = requestOptions.cert;
             if (this._certConfig) {
                 // If using cert, need fs
-                fs = __nccwpck_require__(5747);
+                fs = __nccwpck_require__(7147);
                 // cache the cert content into memory, so we don't have to read it from disk every time
                 if (this._certConfig.caFile && fs.existsSync(this._certConfig.caFile)) {
                     this._ca = fs.readFileSync(this._certConfig.caFile, 'utf8');
@@ -9093,9 +9184,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const qs = __nccwpck_require__(2760);
-const url = __nccwpck_require__(8835);
-const path = __nccwpck_require__(5622);
-const zlib = __nccwpck_require__(8761);
+const url = __nccwpck_require__(7310);
+const path = __nccwpck_require__(1017);
+const zlib = __nccwpck_require__(9796);
 /**
  * creates an url from a request url and optional base url (http://server:8080)
  * @param {string} resource - a fully qualified url or relative path
@@ -9225,90 +9316,6 @@ exports.obtainContentCharset = obtainContentCharset;
 
 /***/ }),
 
-/***/ 2707:
-/***/ ((module) => {
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex;
-  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return ([
-    bth[buf[i++]], bth[buf[i++]],
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]],
-    bth[buf[i++]], bth[buf[i++]],
-    bth[buf[i++]], bth[buf[i++]]
-  ]).join('');
-}
-
-module.exports = bytesToUuid;
-
-
-/***/ }),
-
-/***/ 5859:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// Unique ID creation requires a high quality random # generator.  In node.js
-// this is pretty straight-forward - we use the crypto API.
-
-var crypto = __nccwpck_require__(6417);
-
-module.exports = function nodeRNG() {
-  return crypto.randomBytes(16);
-};
-
-
-/***/ }),
-
-/***/ 824:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var rng = __nccwpck_require__(5859);
-var bytesToUuid = __nccwpck_require__(2707);
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof(options) == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || rng)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || bytesToUuid(rnds);
-}
-
-module.exports = v4;
-
-
-/***/ }),
-
 /***/ 208:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -9344,7 +9351,7 @@ exports.downloadAndExtractTool = void 0;
  * Contains download utility functions.
  */
 const toolCache = __nccwpck_require__(7784);
-const attempt_1 = __nccwpck_require__(6449);
+const attempt_1 = __nccwpck_require__(6494);
 /**
  * Downloads and extracts the tool at the specified URL.
  *
@@ -9411,7 +9418,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getReleaseURL = void 0;
 const httpm = __nccwpck_require__(5538);
-const attempt_1 = __nccwpck_require__(6449);
+const attempt_1 = __nccwpck_require__(6494);
+// archMap is a mapping of how node detects an operating system to the
+// associated cloud sdk architecture value.
+const archMap = {
+    x64: 'x86_64',
+    arm64: 'arm',
+};
 /**
  * Formats the gcloud SDK release URL according to the specified arguments.
  *
@@ -9422,8 +9435,8 @@ const attempt_1 = __nccwpck_require__(6449);
  */
 function formatReleaseURL(os, arch, version) {
     // massage the arch to match gcloud sdk conventions
-    if (arch == 'x64') {
-        arch = 'x86_64';
+    if (archMap[arch]) {
+        arch = archMap[arch];
     }
     let objectName;
     switch (os) {
@@ -9512,12 +9525,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runCmdWithJsonFormat = exports.installComponent = exports.setProjectWithKey = exports.setProject = exports.authenticateGcloudSDK = exports.parseServiceAccountKey = exports.installGcloudSDK = exports.isAuthenticated = exports.isProjectIdSet = exports.getToolCommand = exports.isInstalled = exports.getLatestGcloudSDKVersion = void 0;
 const exec = __nccwpck_require__(1514);
 const toolCache = __nccwpck_require__(7784);
-const os = __nccwpck_require__(2087);
+const os = __nccwpck_require__(2037);
 const format_url_1 = __nccwpck_require__(3844);
 const downloadUtil = __nccwpck_require__(208);
 const installUtil = __nccwpck_require__(2314);
 const version_util_1 = __nccwpck_require__(3234);
 Object.defineProperty(exports, "getLatestGcloudSDKVersion", ({ enumerable: true, get: function () { return version_util_1.getLatestGcloudSDKVersion; } }));
+const fs_1 = __nccwpck_require__(7147);
 /**
  * Checks if gcloud is installed.
  *
@@ -9665,12 +9679,57 @@ function parseServiceAccountKey(serviceAccountKey) {
 }
 exports.parseServiceAccountKey = parseServiceAccountKey;
 /**
+ * Check if a given credential is WIF credential configuration.
+ *
+ * @param credFile - The  WIF credential configuration.
+ * @returns boolean.
+ */
+function isWIFCredFile(credFile) {
+    try {
+        const creds = JSON.parse(credFile);
+        return 'type' in creds && creds.type == 'external_account';
+    }
+    catch (err) {
+        throw new SyntaxError(`Failed to parse credentials as JSON: ${err}`);
+    }
+}
+/**
+ * Authenticates the gcloud tool using a service account key or WIF credential configuration
+ * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
+ * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
+ *
+ * @param serviceAccountKey - The service account key used for authentication.
+ * @param silent - Skip writing output to sdout.
+ * @returns exit code.
+ */
+function authenticateGcloudSDK(serviceAccountKey, silent = true) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Support legacy actions that pass in SA key
+        if (serviceAccountKey) {
+            return authGcloudSAKey(serviceAccountKey, silent);
+        }
+        // Check if GOOGLE_GHA_CREDS_PATH has been set by auth
+        if (process.env.GOOGLE_GHA_CREDS_PATH) {
+            const credFilePath = process.env.GOOGLE_GHA_CREDS_PATH;
+            const credFile = yield fs_1.promises.readFile(credFilePath, 'utf8');
+            // Check if credential is a WIF creds file
+            if (isWIFCredFile(credFile)) {
+                return authGcloudWIFCredsFile(credFilePath, silent);
+            }
+            return authGcloudSAKey(credFile, silent);
+        }
+        // One of GOOGLE_GHA_CREDS_PATH or SA key is required
+        throw new Error('Error authenticating the Cloud SDK. Please use `google-github-actions/auth` to export credentials.');
+    });
+}
+exports.authenticateGcloudSDK = authenticateGcloudSDK;
+/**
  * Authenticates the gcloud tool using a service account key.
  *
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns exit code.
  */
-function authenticateGcloudSDK(serviceAccountKey, silent = true) {
+function authGcloudSAKey(serviceAccountKey, silent = true) {
     return __awaiter(this, void 0, void 0, function* () {
         const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
         const serviceAccountEmail = serviceAccountJson.client_email;
@@ -9690,7 +9749,21 @@ function authenticateGcloudSDK(serviceAccountKey, silent = true) {
         ], options);
     });
 }
-exports.authenticateGcloudSDK = authenticateGcloudSDK;
+/**
+ * Authenticates the gcloud tool using WIF credential configuration.
+ *
+ * @param credsFile - The WIF credential configuration path.
+ * @returns exit code.
+ */
+function authGcloudWIFCredsFile(credFilePath, silent = true) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const toolCommand = getToolCommand();
+        const options = {
+            silent,
+        };
+        return yield exec.exec(toolCommand, ['--quiet', 'auth', 'login', '--cred-file', credFilePath], options);
+    });
+}
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
@@ -9810,7 +9883,7 @@ exports.installGcloudSDK = void 0;
  */
 const toolCache = __nccwpck_require__(7784);
 const core = __nccwpck_require__(2186);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 /**
  * Installs the gcloud SDK into the actions environment.
  *
@@ -9867,7 +9940,7 @@ exports.getLatestGcloudSDKVersion = void 0;
  * Contains version utility functions.
  */
 const httpm = __nccwpck_require__(5538);
-const attempt_1 = __nccwpck_require__(6449);
+const attempt_1 = __nccwpck_require__(6494);
 /**
  * @returns The latest stable version of the gcloud SDK.
  */
@@ -9898,7 +9971,7 @@ exports.getLatestGcloudSDKVersion = getLatestGcloudSDKVersion;
 
 /***/ }),
 
-/***/ 2357:
+/***/ 9491:
 /***/ ((module) => {
 
 "use strict";
@@ -9906,7 +9979,7 @@ module.exports = __webpack_require__(357);
 
 /***/ }),
 
-/***/ 3129:
+/***/ 2081:
 /***/ ((module) => {
 
 "use strict";
@@ -9914,7 +9987,7 @@ module.exports = __webpack_require__(129);
 
 /***/ }),
 
-/***/ 6417:
+/***/ 6113:
 /***/ ((module) => {
 
 "use strict";
@@ -9922,7 +9995,7 @@ module.exports = __webpack_require__(417);
 
 /***/ }),
 
-/***/ 8614:
+/***/ 2361:
 /***/ ((module) => {
 
 "use strict";
@@ -9930,7 +10003,7 @@ module.exports = __webpack_require__(614);
 
 /***/ }),
 
-/***/ 5747:
+/***/ 7147:
 /***/ ((module) => {
 
 "use strict";
@@ -9938,7 +10011,7 @@ module.exports = __webpack_require__(747);
 
 /***/ }),
 
-/***/ 8605:
+/***/ 3685:
 /***/ ((module) => {
 
 "use strict";
@@ -9946,7 +10019,7 @@ module.exports = __webpack_require__(605);
 
 /***/ }),
 
-/***/ 7211:
+/***/ 5687:
 /***/ ((module) => {
 
 "use strict";
@@ -9954,7 +10027,7 @@ module.exports = __webpack_require__(211);
 
 /***/ }),
 
-/***/ 1631:
+/***/ 1808:
 /***/ ((module) => {
 
 "use strict";
@@ -9962,7 +10035,7 @@ module.exports = __webpack_require__(631);
 
 /***/ }),
 
-/***/ 2087:
+/***/ 2037:
 /***/ ((module) => {
 
 "use strict";
@@ -9970,7 +10043,7 @@ module.exports = __webpack_require__(87);
 
 /***/ }),
 
-/***/ 5622:
+/***/ 1017:
 /***/ ((module) => {
 
 "use strict";
@@ -9978,7 +10051,7 @@ module.exports = __webpack_require__(622);
 
 /***/ }),
 
-/***/ 2413:
+/***/ 2781:
 /***/ ((module) => {
 
 "use strict";
@@ -9986,7 +10059,7 @@ module.exports = __webpack_require__(794);
 
 /***/ }),
 
-/***/ 4304:
+/***/ 1576:
 /***/ ((module) => {
 
 "use strict";
@@ -9994,7 +10067,7 @@ module.exports = __webpack_require__(304);
 
 /***/ }),
 
-/***/ 8213:
+/***/ 9512:
 /***/ ((module) => {
 
 "use strict";
@@ -10002,7 +10075,7 @@ module.exports = __webpack_require__(213);
 
 /***/ }),
 
-/***/ 4016:
+/***/ 4404:
 /***/ ((module) => {
 
 "use strict";
@@ -10010,7 +10083,7 @@ module.exports = __webpack_require__(16);
 
 /***/ }),
 
-/***/ 8835:
+/***/ 7310:
 /***/ ((module) => {
 
 "use strict";
@@ -10018,7 +10091,7 @@ module.exports = __webpack_require__(835);
 
 /***/ }),
 
-/***/ 1669:
+/***/ 3837:
 /***/ ((module) => {
 
 "use strict";
@@ -10026,7 +10099,7 @@ module.exports = __webpack_require__(669);
 
 /***/ }),
 
-/***/ 8761:
+/***/ 9796:
 /***/ ((module) => {
 
 "use strict";
@@ -12441,27 +12514,25 @@ function run() {
             const zone = core.getInput('zone');
             const user = core.getInput('user');
             const container = core.getInput('container');
-            const sshKeyFilePath = core.getInput('ssh_key_file_path') || '/home/runner/.ssh/google_compute_engine';
-            const sshKeyExpireAfter = core.getInput('ssh_key_expire_after');
             const sshArgs = core.getInput('ssh_args');
             let command = core.getInput('command');
-            const entrypoint = core.getInput('entrypoint');
-            const credentials = core.getInput('credentials');
+            const script = core.getInput('script');
             let projectId = core.getInput('project_id');
             let gcloudVersion = core.getInput('gcloud_version');
-            const generateSshKeys = core.getInput('generate_ssh_keys');
             // Flags
-            const internalIp = core.getInput('internal_ip');
-            const tunnelThroughIap = core.getInput('tunnel_through_iap');
+            // const internalIp = core.getInput('internal_ip');
+            // const tunnelThroughIap = core.getInput('tunnel_through_iap');
             const flags = core.getInput('flags');
             const installBeta = true; // Flag for installing gcloud beta components
             let cmd;
-            if (command && entrypoint) {
+            if (command && script) {
                 throw new Error('Both `command` and `entrypoint` inputs set - Please select one.');
             }
-            if (internalIp && tunnelThroughIap) {
-                throw new Error('Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.');
-            }
+            // if (internalIp && tunnelThroughIap) {
+            //   throw new Error(
+            //     'Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.',
+            //   );
+            // }
             if (user) {
                 instanceName = `${user}@${instanceName}`;
             }
@@ -12471,35 +12542,35 @@ function run() {
                 instanceName,
                 '--zone',
                 zone,
-                '--quiet', // we need to ignore promts from console
+                '--quiet',
+                '--tunnelThroughIap',
             ];
             if (container) {
                 cmd.push('--container', container);
             }
-            if (sshKeyFilePath) {
-                cmd.push('--ssh-key-file', sshKeyFilePath);
-            }
-            if (sshKeyExpireAfter) {
-                cmd.push('--ssh-key-expire-after', sshKeyExpireAfter);
-            }
-            if (tunnelThroughIap) {
-                cmd.push('--tunnel-through-iap');
-            }
-            if (internalIp) {
-                cmd.push('--internal-ip');
-            }
+            // if (sshKeyFilePath) {
+            //   cmd.push('--ssh-key-file', sshKeyFilePath);
+            // }
+            // if (sshKeyExpireAfter) {
+            //   cmd.push('--ssh-key-expire-after', sshKeyExpireAfter);
+            // }
+            // if (tunnelThroughIap) {
+            //   cmd.push('--tunnel-through-iap');
+            // }
+            // if (internalIp) {
+            //   cmd.push('--internal-ip');
+            // }
             if (flags) {
                 const flagList = parseFlags(flags);
                 if (flagList)
                     cmd = cmd.concat(flagList);
             }
-            if (entrypoint) {
-                if (!fs_1.default.existsSync(entrypoint)) {
-                    const message = 'Entrypoint can not be found. ' +
-                        'Check entrypoint input path.';
+            if (script) {
+                if (!fs_1.default.existsSync(script)) {
+                    const message = 'Script can not be found. Check script input path.';
                     throw new Error(message);
                 }
-                const commandData = fs_1.default.readFileSync(entrypoint).toString('utf8');
+                const commandData = fs_1.default.readFileSync(script).toString('utf8');
                 command = `bash -c \"${commandData}\"`;
             }
             if (sshArgs) {
@@ -12517,8 +12588,7 @@ function run() {
                 core.addPath(path_1.default.join(toolPath, 'bin'));
             }
             // Authenticate gcloud SDK.
-            if (credentials)
-                yield setupGcloud.authenticateGcloudSDK(credentials);
+            yield setupGcloud.authenticateGcloudSDK();
             const authenticated = yield setupGcloud.isAuthenticated();
             if (!authenticated) {
                 throw new Error('Error authenticating the Cloud SDK.');
@@ -12527,16 +12597,13 @@ function run() {
             if (projectId) {
                 yield setupGcloud.setProject(projectId);
             }
-            else if (credentials) {
-                projectId = yield setupGcloud.setProjectWithKey(credentials);
-            }
             else if (process.env.GCLOUD_PROJECT) {
                 yield setupGcloud.setProject(process.env.GCLOUD_PROJECT);
             }
             // Fail if no Project Id is provided if not already set.
             const projectIdSet = yield setupGcloud.isProjectIdSet();
             if (!projectIdSet)
-                throw new Error('No project Id provided. Ensure you have set either the project_id or credentials fields.');
+                throw new Error('No project Id provided.');
             // Install beta components if needed and prepend the beta command
             if (installBeta) {
                 yield setupGcloud.installComponent('beta');
@@ -12561,14 +12628,6 @@ function run() {
             };
             // Run gcloud cmd.
             try {
-                if (generateSshKeys) {
-                    // we should generate ssh keys and update metadata first (executing empty command)
-                    const doNothingCommand = [...cmd, '--command', 'exit 0'];
-                    yield exec.exec(toolCommand, doNothingCommand);
-                }
-                if (!fs_1.default.existsSync(sshKeyFilePath)) {
-                    throw new Error(`${sshKeyFilePath} does not exist. Provide correct ssh keys.`);
-                }
                 cmd = [...cmd, '--command', `${command}`];
                 core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
                 yield exec.exec(toolCommand, cmd, options);

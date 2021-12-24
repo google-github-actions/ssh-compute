@@ -41,34 +41,30 @@ export async function run(): Promise<void> {
     const zone = core.getInput('zone');
     const user = core.getInput('user');
     const container = core.getInput('container');
-    const sshKeyFilePath = core.getInput('ssh_key_file_path') || '/home/runner/.ssh/google_compute_engine';
-    const sshKeyExpireAfter = core.getInput('ssh_key_expire_after');
     const sshArgs = core.getInput('ssh_args');
     let command = core.getInput('command');
-    const entrypoint = core.getInput('entrypoint');
-    const credentials = core.getInput('credentials');
+    const script = core.getInput('script');
     let projectId = core.getInput('project_id');
     let gcloudVersion = core.getInput('gcloud_version');
-    const generateSshKeys = core.getInput('generate_ssh_keys');
   
     // Flags
-    const internalIp = core.getInput('internal_ip');
-    const tunnelThroughIap = core.getInput('tunnel_through_iap');
+    // const internalIp = core.getInput('internal_ip');
+    // const tunnelThroughIap = core.getInput('tunnel_through_iap');
     const flags = core.getInput('flags');
     const installBeta = true; // Flag for installing gcloud beta components
     let cmd;
 
-    if (command && entrypoint) {
+    if (command && script) {
       throw new Error(
         'Both `command` and `entrypoint` inputs set - Please select one.',
       );
     }
   
-    if (internalIp && tunnelThroughIap) {
-      throw new Error(
-        'Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.',
-      );
-    }
+    // if (internalIp && tunnelThroughIap) {
+    //   throw new Error(
+    //     'Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.',
+    //   );
+    // }
 
     if (user) {
       instanceName = `${user}@${instanceName}`;
@@ -81,42 +77,41 @@ export async function run(): Promise<void> {
       '--zone',
       zone,
       '--quiet', // we need to ignore promts from console
+      '--tunnelThroughIap',
     ];
 
     if (container) {
       cmd.push('--container', container);
     }
 
-    if (sshKeyFilePath) {
-      cmd.push('--ssh-key-file', sshKeyFilePath);
-    }
+    // if (sshKeyFilePath) {
+    //   cmd.push('--ssh-key-file', sshKeyFilePath);
+    // }
 
-    if (sshKeyExpireAfter) {
-      cmd.push('--ssh-key-expire-after', sshKeyExpireAfter);
-    }
+    // if (sshKeyExpireAfter) {
+    //   cmd.push('--ssh-key-expire-after', sshKeyExpireAfter);
+    // }
 
-    if (tunnelThroughIap) {
-      cmd.push('--tunnel-through-iap');
-    }
+    // if (tunnelThroughIap) {
+    //   cmd.push('--tunnel-through-iap');
+    // }
 
-    if (internalIp) {
-      cmd.push('--internal-ip');
-    }
+    // if (internalIp) {
+    //   cmd.push('--internal-ip');
+    // }
 
     if (flags) {
       const flagList = parseFlags(flags);
       if (flagList) cmd = cmd.concat(flagList);
     }
 
-    if (entrypoint) {
-      if (!fs.existsSync(entrypoint)) {
-        const message =
-          'Entrypoint can not be found. ' +
-          'Check entrypoint input path.';
+    if (script) {
+      if (!fs.existsSync(script)) {
+        const message = 'Script can not be found. Check script input path.';
         throw new Error(message);
       }
 
-      const commandData = fs.readFileSync(entrypoint).toString('utf8');
+      const commandData = fs.readFileSync(script).toString('utf8');
       command = `bash -c \"${commandData}\"`;
     }
 
@@ -136,7 +131,7 @@ export async function run(): Promise<void> {
     }
 
     // Authenticate gcloud SDK.
-    if (credentials) await setupGcloud.authenticateGcloudSDK(credentials);
+    await setupGcloud.authenticateGcloudSDK();
     const authenticated = await setupGcloud.isAuthenticated();
     if (!authenticated) {
       throw new Error('Error authenticating the Cloud SDK.');
@@ -145,8 +140,6 @@ export async function run(): Promise<void> {
     // set PROJECT ID
     if (projectId) {
       await setupGcloud.setProject(projectId);
-    } else if (credentials) {
-      projectId = await setupGcloud.setProjectWithKey(credentials);
     } else if (process.env.GCLOUD_PROJECT) {
       await setupGcloud.setProject(process.env.GCLOUD_PROJECT);
     }
@@ -154,7 +147,7 @@ export async function run(): Promise<void> {
     const projectIdSet = await setupGcloud.isProjectIdSet();
     if (!projectIdSet)
       throw new Error(
-        'No project Id provided. Ensure you have set either the project_id or credentials fields.',
+        'No project Id provided.',
       );
 
     // Install beta components if needed and prepend the beta command
@@ -182,19 +175,9 @@ export async function run(): Promise<void> {
       },
       silent: true,
     };
+
     // Run gcloud cmd.
     try {
-      if (generateSshKeys) {
-        // we should generate ssh keys and update metadata first (executing empty command)
-        const doNothingCommand = [...cmd, '--command', 'exit 0'];
-        await exec.exec(toolCommand, doNothingCommand);
-      }
-
-      if (!fs.existsSync(sshKeyFilePath)) {
-        throw new Error(
-          `${sshKeyFilePath} does not exist. Provide correct ssh keys.`,
-        );
-      }
       cmd = [...cmd, '--command', `${command}`];
       core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
       await exec.exec(toolCommand, cmd, options);
