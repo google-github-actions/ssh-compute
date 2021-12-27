@@ -77,7 +77,7 @@ export async function run(): Promise<void> {
       '--zone',
       zone,
       '--quiet', // we need to ignore promts from console
-      '--tunnelThroughIap',
+      '--tunnel-through-iap',
     ];
 
     if (container) {
@@ -176,11 +176,15 @@ export async function run(): Promise<void> {
       silent: true,
     };
 
-    // Run gcloud cmd.
     try {
-      cmd = [...cmd, '--command', `${command}`];
+      // we should generate ssh keys first
+      const doNothingCommand = [...cmd, '--ssh-key-expire-after', '30m', '--command', 'exit 0'];
+      await exec.exec(toolCommand, doNothingCommand);
+
+      cmd = [...cmd, '--command', command];
       core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
       await exec.exec(toolCommand, cmd, options);
+
       core.setOutput('stdout', output);
       core.setOutput('stderr', errOutput);
     } catch (error: any) {

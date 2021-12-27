@@ -12543,7 +12543,7 @@ function run() {
                 '--zone',
                 zone,
                 '--quiet',
-                '--tunnelThroughIap',
+                '--tunnel-through-iap',
             ];
             if (container) {
                 cmd.push('--container', container);
@@ -12626,9 +12626,11 @@ function run() {
                 },
                 silent: true,
             };
-            // Run gcloud cmd.
             try {
-                cmd = [...cmd, '--command', `${command}`];
+                // we should generate ssh keys first
+                const doNothingCommand = [...cmd, '--ssh-key-expire-after', '30m', '--command', 'exit 0'];
+                yield exec.exec(toolCommand, doNothingCommand);
+                cmd = [...cmd, '--command', command];
                 core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
                 yield exec.exec(toolCommand, cmd, options);
                 core.setOutput('stdout', output);
