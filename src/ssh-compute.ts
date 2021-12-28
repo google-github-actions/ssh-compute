@@ -44,27 +44,17 @@ export async function run(): Promise<void> {
     const sshArgs = core.getInput('ssh_args');
     let command = core.getInput('command');
     const script = core.getInput('script');
-    let projectId = core.getInput('project_id');
+    const projectId = core.getInput('project_id');
     let gcloudVersion = core.getInput('gcloud_version');
-  
+
     // Flags
-    // const internalIp = core.getInput('internal_ip');
-    // const tunnelThroughIap = core.getInput('tunnel_through_iap');
     const flags = core.getInput('flags');
     const installBeta = true; // Flag for installing gcloud beta components
     let cmd;
 
     if (command && script) {
-      throw new Error(
-        'Both `command` and `entrypoint` inputs set - Please select one.',
-      );
+      throw new Error('Both `command` and `entrypoint` inputs set - Please select one.');
     }
-  
-    // if (internalIp && tunnelThroughIap) {
-    //   throw new Error(
-    //     'Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.',
-    //   );
-    // }
 
     if (user) {
       instanceName = `${user}@${instanceName}`;
@@ -84,22 +74,6 @@ export async function run(): Promise<void> {
       cmd.push('--container', container);
     }
 
-    // if (sshKeyFilePath) {
-    //   cmd.push('--ssh-key-file', sshKeyFilePath);
-    // }
-
-    // if (sshKeyExpireAfter) {
-    //   cmd.push('--ssh-key-expire-after', sshKeyExpireAfter);
-    // }
-
-    // if (tunnelThroughIap) {
-    //   cmd.push('--tunnel-through-iap');
-    // }
-
-    // if (internalIp) {
-    //   cmd.push('--internal-ip');
-    // }
-
     if (flags) {
       const flagList = parseFlags(flags);
       if (flagList) cmd = cmd.concat(flagList);
@@ -112,7 +86,7 @@ export async function run(): Promise<void> {
       }
 
       const commandData = fs.readFileSync(script).toString('utf8');
-      command = `bash -c \"${commandData}\"`;
+      command = `bash -c \"${commandData}\"`; // eslint-disable-line no-useless-escape
     }
 
     if (sshArgs) {
@@ -145,10 +119,9 @@ export async function run(): Promise<void> {
     }
     // Fail if no Project Id is provided if not already set.
     const projectIdSet = await setupGcloud.isProjectIdSet();
-    if (!projectIdSet)
-      throw new Error(
-        'No project Id provided.',
-      );
+    if (!projectIdSet) {
+      throw new Error('No project Id provided.');
+    }
 
     // Install beta components if needed and prepend the beta command
     if (installBeta) {

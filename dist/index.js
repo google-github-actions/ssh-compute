@@ -12517,22 +12517,15 @@ function run() {
             const sshArgs = core.getInput('ssh_args');
             let command = core.getInput('command');
             const script = core.getInput('script');
-            let projectId = core.getInput('project_id');
+            const projectId = core.getInput('project_id');
             let gcloudVersion = core.getInput('gcloud_version');
             // Flags
-            // const internalIp = core.getInput('internal_ip');
-            // const tunnelThroughIap = core.getInput('tunnel_through_iap');
             const flags = core.getInput('flags');
             const installBeta = true; // Flag for installing gcloud beta components
             let cmd;
             if (command && script) {
                 throw new Error('Both `command` and `entrypoint` inputs set - Please select one.');
             }
-            // if (internalIp && tunnelThroughIap) {
-            //   throw new Error(
-            //     'Both `internal_ip` and `tunnel_through_iap` inputs set - Please select one.',
-            //   );
-            // }
             if (user) {
                 instanceName = `${user}@${instanceName}`;
             }
@@ -12548,18 +12541,6 @@ function run() {
             if (container) {
                 cmd.push('--container', container);
             }
-            // if (sshKeyFilePath) {
-            //   cmd.push('--ssh-key-file', sshKeyFilePath);
-            // }
-            // if (sshKeyExpireAfter) {
-            //   cmd.push('--ssh-key-expire-after', sshKeyExpireAfter);
-            // }
-            // if (tunnelThroughIap) {
-            //   cmd.push('--tunnel-through-iap');
-            // }
-            // if (internalIp) {
-            //   cmd.push('--internal-ip');
-            // }
             if (flags) {
                 const flagList = parseFlags(flags);
                 if (flagList)
@@ -12571,7 +12552,7 @@ function run() {
                     throw new Error(message);
                 }
                 const commandData = fs_1.default.readFileSync(script).toString('utf8');
-                command = `bash -c \"${commandData}\"`;
+                command = `bash -c \"${commandData}\"`; // eslint-disable-line no-useless-escape
             }
             if (sshArgs) {
                 cmd.push(`-- ${sshArgs}`);
@@ -12602,8 +12583,9 @@ function run() {
             }
             // Fail if no Project Id is provided if not already set.
             const projectIdSet = yield setupGcloud.isProjectIdSet();
-            if (!projectIdSet)
+            if (!projectIdSet) {
                 throw new Error('No project Id provided.');
+            }
             // Install beta components if needed and prepend the beta command
             if (installBeta) {
                 yield setupGcloud.installComponent('beta');

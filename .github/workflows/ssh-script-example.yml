@@ -15,7 +15,7 @@
 on:
   push:
     branches:
-      - action-init-2
+      - action-init
 
 name: Run script via ssh on GCP instanc
 env:

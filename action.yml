@@ -15,7 +15,7 @@
 name: SSH to Google Cloud Platform compute instances
 author: Google LLC
 description: |-
-  Use this action to connect to Google Cloud Platform instances via ssh and execute user’s commands.
+  Use this action to connect to Google Cloud Platform instances via ssh and execute user's commands.
 
 inputs:
   instance_name:
@@ -46,18 +46,6 @@ inputs:
     description: |-
       Additional flags to be passed to ssh tool. Example: '-vvv -L 80:%INSTANCE%:80'.
     required: false
-
-  # internal_ip:
-  #   description: |-
-  #     Connect to instances using their internal IP addresses rather than their external IP addresses.
-  #     Use this to connect from one instance to another on the same VPC network, over a VPN connection,
-  #     or between two peered VPC networks.
-  #   required: false
-
-  # tunnel_through_iap:
-  #   description: |-
-  #     Tunnel the ssh connection through Cloud Identity-Aware Proxy for TCP forwarding.
-  #   required: false
 
   command:
     description: |-
