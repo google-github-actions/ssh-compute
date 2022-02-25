@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,11 +45,12 @@ jobs:
       uses: FrodoTheTrue/ssh-compute@action-init
       with:
         instance_name: instance-abba
-        command: echo Hello world
         zone: us-central1-a
+        ssh_public_key: ${{ secrets.GCP_SSH_PUBLIC_KEY }}
+        ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+        command: echo Hello world
 
     - name: Show Output
       run: |-
         echo '${{ steps.ssh.outputs.stdout }}'
         echo '${{ steps.ssh.outputs.stderr }}'
-  

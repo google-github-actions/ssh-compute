@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,9 +30,24 @@ inputs:
 
   user:
     description: |-
-      Username with which to SSH. If omitted, the user login name is used.
-      GH action runner uses 'runner' as a default name.
-      If using OS Login, USER will be replaced by the OS Login user.
+      Specifies the username with which to SSH. 
+      If omitted, the user login name is used. If using OS Login, USER will be replaced by the OS Login user.
+    required: false
+
+  ssh_private_key:
+    description: |-
+      SSH private key with which to SSH.
+    required: true
+
+  ssh_public_key:
+    description: |-
+      SSH public key with which to SSH.
+    required: true
+
+  ssh_keys_folder:
+    description: |-
+      Path for a folder to store ssh keys
+    default: '/tmp/tmp-ssh-keys'
     required: false
 
   container:
@@ -84,5 +99,6 @@ outputs:
     description: stderr from ssh command
 
 runs:
-  using: node12
-  main: dist/index.js
+  using: 'node16'
+  main: 'dist/main/index.js'
+  post: 'dist/post/index.js'

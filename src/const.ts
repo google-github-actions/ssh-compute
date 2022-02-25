@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-import { run } from './ssh-compute';
-
-run();
+export const SSH_KEYS_DEFAULT_TMP_FOLDER = '/tmp/tmp-ssh-keys';
+export const SSH_PUBLIC_KEY_FILENAME = 'google_compute_engine.pub';
+export const SSH_PRIVATE_KEY_FILENAME = 'google_compute_engine';

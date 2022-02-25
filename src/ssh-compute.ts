@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
+
 import path from 'path';
-import fs from 'fs';
+import { promises as fs } from 'fs';
+
+import { SSH_PUBLIC_KEY_FILENAME, SSH_PRIVATE_KEY_FILENAME } from './const';
 
 export const GCLOUD_METRICS_ENV_VAR = 'CLOUDSDK_METRICS_ENVIRONMENT';
 export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
@@ -40,6 +44,9 @@ export async function run(): Promise<void> {
     let instanceName = core.getInput('instance_name');
     const zone = core.getInput('zone');
     const user = core.getInput('user');
+    const ssh_public_key = core.getInput('ssh_public_key');
+    const ssh_private_key = core.getInput('ssh_private_key');
+    const ssh_keys_folder = core.getInput('ssh_keys_folder');
     const container = core.getInput('container');
     const sshArgs = core.getInput('ssh_args');
     let command = core.getInput('command');
@@ -66,9 +73,21 @@ export async function run(): Promise<void> {
       instanceName,
       '--zone',
       zone,
-      '--quiet', // we need to ignore promts from console
+      '--ssh-key-file',
+      `${ssh_keys_folder}/${SSH_PRIVATE_KEY_FILENAME}`,
+      '--quiet', // we need to ignore prompts from console
       '--tunnel-through-iap',
     ];
+
+    // Save public and private ssh keys to the temp folder
+    await fs.mkdir(ssh_keys_folder, { recursive: true });
+    await fs.writeFile(`${ssh_keys_folder}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
+      mode: 0o600,
+    });
+    await fs.writeFile(`${ssh_keys_folder}/${SSH_PRIVATE_KEY_FILENAME}`, '', { mode: 0o600 });
+    for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
+      await fs.appendFile(`${ssh_keys_folder}/${SSH_PRIVATE_KEY_FILENAME}`, key.trim() + '\n');
+    }
 
     if (container) {
       cmd.push('--container', container);
@@ -80,12 +99,14 @@ export async function run(): Promise<void> {
     }
 
     if (script) {
-      if (!fs.existsSync(script)) {
+      try {
+        await fs.access(script);
+      } catch (error: any) {
         const message = 'Script can not be found. Check script input path.';
         throw new Error(message);
       }
 
-      const commandData = fs.readFileSync(script).toString('utf8');
+      const commandData = (await fs.readFile(script)).toString('utf8');
       command = `bash -c \"${commandData}\"`; // eslint-disable-line no-useless-escape
     }
 
@@ -150,12 +171,7 @@ export async function run(): Promise<void> {
     };
 
     try {
-      // we should generate ssh keys first
-      const doNothingCommand = [...cmd, '--ssh-key-expire-after', '30m', '--command', 'exit 0'];
-      await exec.exec(toolCommand, doNothingCommand);
-
       cmd = [...cmd, '--command', command];
-      core.info(`running: ${toolCommand} ${cmd.join(' ')}`);
       await exec.exec(toolCommand, cmd, options);
 
       core.setOutput('stdout', output);
