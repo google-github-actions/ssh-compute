@@ -22,7 +22,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
-import { exactlyOneOf, isPinnedToHead, pinnedToHeadWarning, writeSecureFile } from '@google-github-actions/actions-utils';
+import { exactlyOneOf, isPinnedToHead, pinnedToHeadWarning } from '@google-github-actions/actions-utils';
 
 import path from 'path';
 import { promises as fs } from 'fs';
@@ -93,17 +93,17 @@ export async function run(): Promise<void> {
 
   // Save public and private ssh keys to the temp folder
   await fs.mkdir(ssh_keys_dir, { recursive: true });
-  await writeSecureFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key);
-  // await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
-  //   mode: 0o600,
-  // });
+  // await writeSecureFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key);
+  await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
+    mode: 0o640, flag: 'wx'
+  });
 
   let correctPrivateKeyData = '';
   for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
     correctPrivateKeyData += `${key.trim()}\n`;
   }
-  // await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, { mode: 0o600 });
-  await writeSecureFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData);
+  await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, { mode: 0o640, flag: 'wx' });
+  // await writeSecureFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData);
 
   if (container) {
     cmd.push('--container', container);
