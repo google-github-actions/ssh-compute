@@ -97,9 +97,12 @@ export async function run(): Promise<void> {
     mode: 0o600,
   });
   await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, '', { mode: 0o600 });
+
+  let correctPrivateKeyData = '';
   for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
-    await fs.appendFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, key.trim() + '\n');
+    correctPrivateKeyData += `${key.trim()}\n`;
   }
+  await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, { mode: 0o600 });
 
   if (container) {
     cmd.push('--container', container);
