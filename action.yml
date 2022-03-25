@@ -44,10 +44,9 @@ inputs:
       SSH public key with which to SSH.
     required: true
 
-  ssh_keys_folder:
+  ssh_keys_dir:
     description: |-
-      Path for a folder to store ssh keys
-    default: '/tmp/tmp-ssh-keys'
+      Path for a directory to store ssh keys
     required: false
 
   container:

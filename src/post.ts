@@ -17,18 +17,24 @@
 
 import { promises as fs } from 'fs';
 
-import { setFailed } from '@actions/core';
-import { getInput } from '@actions/core';
+import { setFailed, info as logInfo } from '@actions/core';
 import { errorMessage } from '@google-github-actions/actions-utils';
+
+import { GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from './const';
 
 /**
  * Executes the post action, documented inline.
  */
 export async function run(): Promise<void> {
-  const ssh_keys_folder = getInput('ssh_keys_folder');
   try {
     // We should remove temp directory with ssh keys
-    await fs.rm(ssh_keys_folder, { recursive: true });
+    const ssh_keys_dir = process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
+    if (!ssh_keys_dir) {
+      logInfo(`Skipping ssh keys directory cleanup`);
+      return;
+    }
+    await fs.rm(ssh_keys_dir, { recursive: true });
+    delete process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
   } catch (err) {
     const msg = errorMessage(err);
     setFailed(`google-github-actions/ssh-compute post failed with: ${msg}`);

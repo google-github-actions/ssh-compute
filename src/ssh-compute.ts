@@ -15,6 +15,9 @@
  */
 'use strict';
 
+import uuid from 'uuid';
+import os from 'os';
+
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
@@ -24,7 +27,7 @@ import { exactlyOneOf, isPinnedToHead, pinnedToHeadWarning } from '@google-githu
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import { SSH_PUBLIC_KEY_FILENAME, SSH_PRIVATE_KEY_FILENAME } from './const';
+import { SSH_PUBLIC_KEY_FILENAME, SSH_PRIVATE_KEY_FILENAME, GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from './const';
 
 export const GCLOUD_METRICS_ENV_VAR = 'CLOUDSDK_METRICS_ENVIRONMENT';
 export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
@@ -52,13 +55,15 @@ export async function run(): Promise<void> {
   const user = core.getInput('user');
   const ssh_public_key = core.getInput('ssh_public_key');
   const ssh_private_key = core.getInput('ssh_private_key');
-  const ssh_keys_folder = core.getInput('ssh_keys_folder');
+  const ssh_keys_dir = core.getInput('ssh_keys_dir') || `${os.tmpdir()}/${uuid.v4()}`;
   const container = core.getInput('container');
   const sshArgs = core.getInput('ssh_args');
   let command = core.getInput('command');
   const script = core.getInput('script');
   let projectId = core.getInput('project_id');
   let gcloudVersion = core.getInput('gcloud_version');
+
+  core.exportVariable(GOOGLE_SSH_KEYS_TEMP_DIR_VAR, ssh_keys_dir);
 
   // Flags
   const flags = core.getInput('flags');
@@ -69,7 +74,6 @@ export async function run(): Promise<void> {
   if (!exactlyOneOf([command, script])) {
     throw new Error('Either `command` or `entrypoint` should be set');
   }
-
 
   if (user) {
     instanceName = `${user}@${instanceName}`;
@@ -82,19 +86,19 @@ export async function run(): Promise<void> {
     '--zone',
     zone,
     '--ssh-key-file',
-    `${ssh_keys_folder}/${SSH_PRIVATE_KEY_FILENAME}`,
+    `${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`,
     '--quiet', // we need to ignore prompts from console
     '--tunnel-through-iap',
   ];
 
   // Save public and private ssh keys to the temp folder
-  await fs.mkdir(ssh_keys_folder, { recursive: true });
-  await fs.writeFile(`${ssh_keys_folder}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
+  await fs.mkdir(ssh_keys_dir, { recursive: true });
+  await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
     mode: 0o600,
   });
-  await fs.writeFile(`${ssh_keys_folder}/${SSH_PRIVATE_KEY_FILENAME}`, '', { mode: 0o600 });
+  await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, '', { mode: 0o600 });
   for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
-    await fs.appendFile(`${ssh_keys_folder}/${SSH_PRIVATE_KEY_FILENAME}`, key.trim() + '\n');
+    await fs.appendFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, key.trim() + '\n');
   }
 
   if (container) {
