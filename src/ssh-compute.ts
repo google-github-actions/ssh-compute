@@ -22,12 +22,20 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
-import { exactlyOneOf, isPinnedToHead, pinnedToHeadWarning, writeSecureFile } from '@google-github-actions/actions-utils';
+import {
+  exactlyOneOf,
+  isPinnedToHead,
+  pinnedToHeadWarning,
+} from '@google-github-actions/actions-utils';
 
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import { SSH_PUBLIC_KEY_FILENAME, SSH_PRIVATE_KEY_FILENAME, GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from './const';
+import {
+  SSH_PUBLIC_KEY_FILENAME,
+  SSH_PRIVATE_KEY_FILENAME,
+  GOOGLE_SSH_KEYS_TEMP_DIR_VAR,
+} from './const';
 
 export const GCLOUD_METRICS_ENV_VAR = 'CLOUDSDK_METRICS_ENVIRONMENT';
 export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
@@ -60,7 +68,7 @@ export async function run(): Promise<void> {
   const sshArgs = core.getInput('ssh_args');
   let command = core.getInput('command');
   const script = core.getInput('script');
-  let projectId = core.getInput('project_id');
+  const projectId = core.getInput('project_id');
   let gcloudVersion = core.getInput('gcloud_version');
 
   core.exportVariable(GOOGLE_SSH_KEYS_TEMP_DIR_VAR, ssh_keys_dir);
@@ -70,7 +78,6 @@ export async function run(): Promise<void> {
   const installBeta = true; // Flag for installing gcloud beta components
   let cmd;
 
-  
   if (!exactlyOneOf([command, script])) {
     throw new Error('Either `command` or `entrypoint` should be set');
   }
@@ -94,14 +101,18 @@ export async function run(): Promise<void> {
   // Save public and private ssh keys to the temp folder
   await fs.mkdir(ssh_keys_dir, { recursive: true });
   await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
-    mode: 0o600, flag: 'wx'
+    mode: 0o600,
+    flag: 'wx',
   });
 
   let correctPrivateKeyData = '';
   for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
     correctPrivateKeyData += `${key.trim()}\n`;
   }
-  await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, { mode: 0o600, flag: 'wx' });
+  await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, {
+    mode: 0o600,
+    flag: 'wx',
+  });
 
   if (container) {
     cmd.push('--container', container);
@@ -156,7 +167,7 @@ export async function run(): Promise<void> {
 
   cmd = [...cmd, '--command', command];
   const toolCommand = setupGcloud.getToolCommand();
-  const options = { silent: true, ignoreReturnCode: true }
+  const options = { silent: true, ignoreReturnCode: true };
   const commandString = `${toolCommand} ${cmd.join(' ')}`;
   core.info(`Running: ${commandString}`);
 
