@@ -15,6 +15,20 @@
  */
 'use strict';
 
+import * as core from '@actions/core';
+
 import { run } from './ssh-compute';
 
-run();
+try {
+  run();
+} catch (error: any) {
+  core.setFailed(convertUnknown(error));
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function convertUnknown(unknown: any): string {
+  if (unknown instanceof Error) {
+    return unknown.message;
+  }
+  return unknown as string;
+}
