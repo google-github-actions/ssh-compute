@@ -30,6 +30,7 @@ import {
   errorMessage,
   randomFilepath,
 } from '@google-github-actions/actions-utils';
+
 import sshpk from 'sshpk';
 
 import {
@@ -59,7 +60,6 @@ async function run(): Promise<void> {
     let instanceName = core.getInput('instance_name');
     const zone = core.getInput('zone');
     const user = core.getInput('user');
-    // const ssh_public_key = core.getInput('ssh_public_key');
     const ssh_private_key = core.getInput('ssh_private_key');
     const ssh_keys_dir = core.getInput('ssh_keys_dir') || randomFilepath();
     const container = core.getInput('container');
@@ -110,13 +110,13 @@ async function run(): Promise<void> {
     // Get public key from the private key
     const pubKeyObject = createPublicKey({
       key: sshpk.parsePrivateKey(correctPrivateKeyData, 'ssh').toBuffer('pkcs8').toString(),
-      format: 'pem'
-    })
-    
+      format: 'pem',
+    });
+
     const publicKey = pubKeyObject.export({
       format: 'pem',
-      type: 'spki'
-    })
+      type: 'spki',
+    });
 
     await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, publicKey, {
       mode: 0o644,

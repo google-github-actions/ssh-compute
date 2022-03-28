@@ -39,11 +39,6 @@ inputs:
       SSH private key with which to SSH.
     required: true
 
-  ssh_public_key:
-    description: |-
-      SSH public key with which to SSH.
-    required: true
-
   ssh_keys_dir:
     description: |-
       Path for a directory to store ssh keys

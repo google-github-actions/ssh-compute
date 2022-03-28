@@ -46,7 +46,6 @@ jobs:
       with:
         instance_name: instance-abba
         zone: us-central1-a
-        ssh_public_key: ${{ secrets.GCP_SSH_PUBLIC_KEY }}
         ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
         command: echo Hello world
 
