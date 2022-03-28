@@ -65,12 +65,14 @@ inputs:
     description: |-
       A command to run on the virtual machine.
       Action runs the command on the target instance and then exits.
+      You must specify at least command or script, specifying both command and script is invalid.
     required: false
 
   script:
     description: |-
       A path for a bash script to run on the virtual machine.
       Action runs the file on the target instance and then exits.
+      You must specify at least command or script, specifying both command and script is invalid.
     required: false
 
   project_id:
@@ -96,6 +98,10 @@ outputs:
     description: stdout from ssh command
   stderr:
     description: stderr from ssh command
+
+branding:
+  icon: 'terminal'
+  color: 'blue'
 
 runs:
   using: 'node16'

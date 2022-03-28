@@ -17,7 +17,7 @@
 
 import { promises as fs } from 'fs';
 
-import { setFailed, info as logInfo } from '@actions/core';
+import { info as logInfo } from '@actions/core';
 import { errorMessage } from '@google-github-actions/actions-utils';
 
 import { GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from './const';
@@ -33,11 +33,11 @@ export async function run(): Promise<void> {
       logInfo(`Skipping ssh keys directory cleanup`);
       return;
     }
-    await fs.rm(ssh_keys_dir, { recursive: true });
+    await fs.rm(ssh_keys_dir, { recursive: true, force: true });
     delete process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
   } catch (err) {
     const msg = errorMessage(err);
-    setFailed(`google-github-actions/ssh-compute post failed with: ${msg}`);
+    logInfo(`google-github-actions/ssh-compute post failed with: ${msg}`);
   }
 }
 

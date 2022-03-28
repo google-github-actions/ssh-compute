@@ -14,17 +14,17 @@
  * limitations under the License.
  */
  {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "commonjs",
-      "lib": [
-        "es6"
-      ],
-      "outDir": "./dist",
-      "rootDirs": ["./src"],
-      "strict": true,
-      "noImplicitAny": true,
-      "esModuleInterop": true
-    },
-    "exclude": ["node_modules", "**/*.test.ts"]
-  }
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": [
+      "es6"
+    ],
+    "outDir": "./dist",
+    "rootDirs": ["./src"],
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["node_modules", "**/*.test.ts"]
+}

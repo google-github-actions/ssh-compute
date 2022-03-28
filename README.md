@@ -1,18 +1,3 @@
-<!--
-Copyright 2022 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
 # ssh-compute
 
 Compute SSH Github Action aims to provide an easy way to connect to GCP instances
@@ -33,7 +18,7 @@ This action requires:
 
 - [Grant the required IAM permissions](https://cloud.google.com/iap/docs/using-tcp-forwarding#grant-permission) to enable IAP TCP forwarding.
 
-- Set Google Cloud credentials that are authorized ssh connection to the VM. See the Authorization section below for more information.
+- Set Google Cloud credentials that are authorized ssh connection to the VM. See the [Authorization](#Authorization) section below for more information.
 
 ## Usage
 
@@ -45,10 +30,10 @@ jobs:
       id-token: 'write'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: 'actions/checkout@v2'
 
-    - id: auth
-      uses: google-github-actions/auth@v0
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
       with:
         workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
@@ -56,11 +41,11 @@ jobs:
     - id: 'compute-ssh'
       uses: 'google-github-actions/ssh-compute@v0'
       with:
-        instance_name: example-instance
-        zone: us-central1-a
-        ssh_public_key: ${{ secrets.GCP_SSH_PUBLIC_KEY }}
-        ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-        command: echo Hello world
+        instance_name: 'example-instance'
+        zone: 'us-central1-a'
+        ssh_public_key: '${{ secrets.GCP_SSH_PUBLIC_KEY }}'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
 
     # Example of using the output
     - id: 'test'
@@ -99,11 +84,11 @@ jobs:
     - id: 'compute-ssh'
       uses: 'google-github-actions/ssh-compute@v0'
       with:
-        instance_name: example-instance
-        zone: us-central1-a
-        ssh_public_key: ${{ secrets.GCP_SSH_PUBLIC_KEY }}
-        ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-        command: echo Hello world
+        instance_name: 'example-instance'
+        zone: 'us-central1-a'
+        ssh_public_key: '${{ secrets.GCP_SSH_PUBLIC_KEY }}'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
 ```
 
 #### Authenticating via Service Account Key JSON
@@ -122,11 +107,11 @@ jobs:
     - id: 'compute-ssh'
       uses: 'google-github-actions/ssh-compute@v0'
       with:
-        instance_name: example-instance
-        zone: us-central1-a
-        ssh_public_key: ${{ secrets.GCP_SSH_PUBLIC_KEY }}
-        ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-        command: echo Hello world
+        instance_name: 'example-instance'
+        zone: 'us-central1-a'
+        ssh_public_key: '${{ secrets.GCP_SSH_PUBLIC_KEY }}'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
 ```
 
 ### Via Application Default Credentials
@@ -145,9 +130,9 @@ jobs:
     - id: 'compute-ssh'
       uses: 'google-github-actions/ssh-compute@v0'
       with:
-        instance_name: example-instance
-        zone: us-central1-a
-        ssh_public_key: ${{ secrets.GCP_SSH_PUBLIC_KEY }}
-        ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-        command: echo Hello world
+        instance_name: 'example-instance'
+        zone: 'us-central1-a'
+        ssh_public_key: '${{ secrets.GCP_SSH_PUBLIC_KEY }}'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
 ```
