@@ -17,6 +17,7 @@
 
 import path from 'path';
 import { promises as fs } from 'fs';
+import { createPublicKey } from 'crypto';
 
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
@@ -57,7 +58,7 @@ async function run(): Promise<void> {
     let instanceName = core.getInput('instance_name');
     const zone = core.getInput('zone');
     const user = core.getInput('user');
-    const ssh_public_key = core.getInput('ssh_public_key');
+    // const ssh_public_key = core.getInput('ssh_public_key');
     const ssh_private_key = core.getInput('ssh_private_key');
     const ssh_keys_dir = core.getInput('ssh_keys_dir') || randomFilepath();
     const container = core.getInput('container');
@@ -94,12 +95,7 @@ async function run(): Promise<void> {
       '--tunnel-through-iap',
     ];
 
-    // Save public and private ssh keys to the temp folder
     await fs.mkdir(ssh_keys_dir, { recursive: true });
-    await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, ssh_public_key, {
-      mode: 0o644,
-      flag: 'wx',
-    });
 
     let correctPrivateKeyData = '';
     for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
@@ -107,6 +103,22 @@ async function run(): Promise<void> {
     }
     await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, {
       mode: 0o600,
+      flag: 'wx',
+    });
+
+    // Get public key from the private key
+    const pubKeyObject = createPublicKey({
+      key: correctPrivateKeyData,
+      format: 'pem'
+    })
+    
+    const publicKey = pubKeyObject.export({
+      format: 'pem',
+      type: 'spki'
+    })
+
+    await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, publicKey, {
+      mode: 0o644,
       flag: 'wx',
     });
 
