@@ -30,6 +30,7 @@ import {
   errorMessage,
   randomFilepath,
 } from '@google-github-actions/actions-utils';
+import sshpk from 'sshpk';
 
 import {
   SSH_PUBLIC_KEY_FILENAME,
@@ -108,7 +109,7 @@ async function run(): Promise<void> {
 
     // Get public key from the private key
     const pubKeyObject = createPublicKey({
-      key: correctPrivateKeyData,
+      key: sshpk.parsePrivateKey(correctPrivateKeyData, 'ssh').toBuffer('pkcs8').toString(),
       format: 'pem'
     })
     
