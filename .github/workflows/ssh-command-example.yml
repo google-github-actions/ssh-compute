@@ -15,21 +15,21 @@
 on:
   push:
     branches:
-      - action-init
+      - 'action-init'
 
-name: Connect to GCP instance via ssh
+name: 'Connect to GCP instance via ssh and execute a command'
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  ZONE: 'us-central1-a'
 
 jobs:
   ssh:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
     permissions:
       contents: 'read'
       id-token: 'write'
 
     steps:
-    - name: Checkout
+    - name: 'Checkout'
       uses: 'actions/checkout@v2'
 
     # Configure Workload Identity Federation and generate an access token.
@@ -40,16 +40,16 @@ jobs:
         workload_identity_provider: 'projects/373360097482/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         service_account: 'my-service-account@diregapic-samples.iam.gserviceaccount.com'
         
-    - name: SSH to GCP instance
-      id: ssh
-      uses: FrodoTheTrue/ssh-compute@action-init
+    - name: 'SSH to GCP instance'
+      id: 'ssh'
+      uses: 'FrodoTheTrue/ssh-compute@action-init'
       with:
-        instance_name: instance-abba
-        zone: us-central1-a
-        ssh_private_key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-        command: echo Hello world
+        instance_name: 'instance-abba'
+        zone: '${{ env.ZONE }}'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
 
-    - name: Show Output
+    - name: 'Show Output'
       run: |-
         echo '${{ steps.ssh.outputs.stdout }}'
         echo '${{ steps.ssh.outputs.stderr }}'

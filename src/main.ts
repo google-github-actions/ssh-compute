@@ -128,7 +128,7 @@ async function run(): Promise<void> {
     }
 
     if (flags) {
-      const flagList = parseFlags(flags);
+      const flagList = parseFlags(flags.replace('\n', ' '));
       if (flagList) cmd = cmd.concat(flagList);
     }
 

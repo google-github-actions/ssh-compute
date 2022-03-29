@@ -17,9 +17,8 @@ on:
     branches:
       - 'main'
 
-name: 'Run script via ssh on GCP instance'
+name: 'Connect to GCP instance via ssh and run a script'
 env:
-  PROJECT_ID: '${{ secrets.GCP_PROJECT }}'
   ZONE: 'us-central1-a'
 
 jobs:
