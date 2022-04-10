@@ -29,6 +29,7 @@ import {
   pinnedToHeadWarning,
   errorMessage,
   randomFilepath,
+  presence,
 } from '@google-github-actions/actions-utils';
 
 import sshpk from 'sshpk';
@@ -46,7 +47,7 @@ export function parseFlags(flags: string): RegExpMatchArray {
   return flags.match(/(".*?"|[^"\s=]+)+(?=\s*|\s*$)/g)!; // Split on space or "=" if not in quotes
 }
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   try {
     core.exportVariable(GCLOUD_METRICS_ENV_VAR, GCLOUD_METRICS_LABEL);
 
@@ -60,24 +61,29 @@ async function run(): Promise<void> {
     let instanceName = core.getInput('instance_name');
     const zone = core.getInput('zone');
     const user = core.getInput('user');
-    const ssh_private_key = core.getInput('ssh_private_key');
-    const ssh_keys_dir = core.getInput('ssh_keys_dir') || randomFilepath();
+    const sshPrivateKey = core.getInput('ssh_private_key');
+    const sshKeysDir = core.getInput('ssh_keys_dir') || randomFilepath();
     const container = core.getInput('container');
     const sshArgs = core.getInput('ssh_args');
     let command = core.getInput('command');
     const script = core.getInput('script');
-    const projectId = core.getInput('project_id');
+    const projectID = core.getInput('project_id');
     let gcloudVersion = core.getInput('gcloud_version');
+    const gcloudComponent = presence(core.getInput('gcloud_component'));
 
-    core.exportVariable(GOOGLE_SSH_KEYS_TEMP_DIR_VAR, ssh_keys_dir);
+    core.exportVariable(GOOGLE_SSH_KEYS_TEMP_DIR_VAR, sshKeysDir);
 
     // Flags
     const flags = core.getInput('flags');
-    const installBeta = true; // Flag for installing gcloud beta components
     let cmd;
 
-    if (!exactlyOneOf([command, script])) {
-      throw new Error('Either `command` or `entrypoint` should be set');
+    if (!exactlyOneOf(command, script)) {
+      throw new Error('either `command` or `script` should be set');
+    }
+
+    // Validate gcloud component input
+    if (gcloudComponent && gcloudComponent !== 'alpha' && gcloudComponent !== 'beta') {
+      throw new Error(`invalid input received for gcloud_component: ${gcloudComponent}`);
     }
 
     if (user) {
@@ -91,18 +97,19 @@ async function run(): Promise<void> {
       '--zone',
       zone,
       '--ssh-key-file',
-      `${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`,
+      `${sshKeysDir}/${SSH_PRIVATE_KEY_FILENAME}`,
       '--quiet', // we need to ignore prompts from console
       '--tunnel-through-iap',
     ];
+    // gcloudComponent = gcloudComponent ?? 'beta';
 
-    await fs.mkdir(ssh_keys_dir, { recursive: true });
+    await fs.mkdir(sshKeysDir, { recursive: true });
 
     let correctPrivateKeyData = '';
-    for (const key of ssh_private_key.split(/(?=-----BEGIN)/)) {
+    for (const key of sshPrivateKey.split(/(?=-----BEGIN)/)) {
       correctPrivateKeyData += `${key.trim()}\n`;
     }
-    await fs.writeFile(`${ssh_keys_dir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, {
+    await fs.writeFile(`${sshKeysDir}/${SSH_PRIVATE_KEY_FILENAME}`, correctPrivateKeyData, {
       mode: 0o600,
       flag: 'wx',
     });
@@ -118,7 +125,7 @@ async function run(): Promise<void> {
       type: 'spki',
     });
 
-    await fs.writeFile(`${ssh_keys_dir}/${SSH_PUBLIC_KEY_FILENAME}`, publicKey, {
+    await fs.writeFile(`${sshKeysDir}/${SSH_PUBLIC_KEY_FILENAME}`, publicKey, {
       mode: 0o644,
       flag: 'wx',
     });
@@ -160,7 +167,7 @@ async function run(): Promise<void> {
     }
 
     // set PROJECT ID
-    if (projectId) cmd.push('--project', projectId);
+    if (projectID) cmd.push('--project', projectID);
 
     // Fail if no Project Id is provided if not already set.
     const projectIdSet = await setupGcloud.isProjectIdSet();
@@ -168,10 +175,10 @@ async function run(): Promise<void> {
       throw new Error('No project Id provided.');
     }
 
-    // Install beta components if needed and prepend the beta command
-    if (installBeta) {
-      await setupGcloud.installComponent('beta');
-      cmd.unshift('beta');
+    // Install gcloud component if needed and prepend the command
+    if (gcloudComponent) {
+      await setupGcloud.installComponent(gcloudComponent);
+      cmd.unshift(gcloudComponent);
     }
 
     cmd = [...cmd, '--command', command];
@@ -195,4 +202,6 @@ async function run(): Promise<void> {
   }
 }
 
-run();
+if (require.main === module) {
+  run();
+}
