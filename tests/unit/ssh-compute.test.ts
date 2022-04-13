@@ -72,20 +72,24 @@ describe('#ssh-compute', function () {
       const args = call.args[1];
       expect(args).to.include.members(['--project', 'my-test-project']);
     });
+
     it('installs the gcloud SDK if it is not already installed', async function () {
       this.stubs.isInstalled.returns(false);
       await run();
       expect(this.stubs.installGcloudSDK.callCount).to.eq(1);
     });
+
     it('uses the cached gcloud SDK if it was already installed', async function () {
       this.stubs.isInstalled.returns(true);
       await run();
       expect(this.stubs.installGcloudSDK.callCount).to.eq(0);
     });
+
     it('uses default components without gcloud_component flag', async function () {
       await run();
       expect(this.stubs.installComponent.callCount).to.eq(0);
     });
+
     it('throws error with invalid gcloud component flag', async function () {
       this.stubs.getInput.withArgs('gcloud_component').returns('wrong_value');
       await run();
@@ -94,16 +98,19 @@ describe('#ssh-compute', function () {
           .callCount,
       ).to.be.at.least(1);
     });
+
     it('installs alpha component with alpha flag', async function () {
       this.stubs.getInput.withArgs('gcloud_component').returns('alpha');
       await run();
       expect(this.stubs.installComponent.withArgs('alpha').callCount).to.eq(1);
     });
+
     it('installs beta component with beta flag', async function () {
       this.stubs.getInput.withArgs('gcloud_component').returns('beta');
       await run();
       expect(this.stubs.installComponent.withArgs('beta').callCount).to.eq(1);
     });
+
     it('throws an error if both script and command are provided', async function () {
       this.stubs.getInput.withArgs('script').returns('test script');
       this.stubs.getInput.withArgs('command').returns('test command');
@@ -113,6 +120,7 @@ describe('#ssh-compute', function () {
           .callCount,
       ).to.be.at.least(1);
     });
+
     it('throws an error if neither script nor command is set', async function () {
       this.stubs.getInput.withArgs('command').returns(undefined);
       await run();
@@ -121,6 +129,7 @@ describe('#ssh-compute', function () {
           .callCount,
       ).to.be.at.least(1);
     });
+
     it('sets the correct instance name if user is provided', async function () {
       this.stubs.getInput.withArgs('user').returns('testuser');
       await run();
@@ -130,6 +139,7 @@ describe('#ssh-compute', function () {
       const args = call.args[1];
       expect(args).to.include.members(['testuser@hello-world-instance']);
     });
+
     it('sets the container if provided', async function () {
       this.stubs.getInput.withArgs('container').returns('my-test-container');
       await run();
@@ -139,32 +149,38 @@ describe('#ssh-compute', function () {
       const args = call.args[1];
       expect(args).to.include.members(['--container', 'my-test-container']);
     });
+
     it('sets the temp var dir to env if provided', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
       const call = this.stubs.exportVariable.getCall(1);
       expect(call.args[1]).to.be.equal('temp-dir');
     });
+
     it('sets a random filepath if dir not set', async function () {
       await run();
       const call = this.stubs.exportVariable.getCall(1);
       expect(call.args[1].length).to.be.gt(0);
     });
+
     it('creates folder for the keys', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
       expect(this.stubs.mkdir.withArgs('temp-dir').callCount).to.eq(1);
     });
+
     it('writes private key to the folder', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
       expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(1);
     });
+
     it('writes public key to the folder', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
       expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(1);
     });
+
     it('sets the correct command if script is provided', async function () {
       this.stubs.getInput.withArgs('command').returns(undefined);
       this.stubs.getInput.withArgs('script').returns('script-examples/script.sh');
@@ -174,6 +190,7 @@ describe('#ssh-compute', function () {
       const args = call.args[1];
       expect(args).to.include.members(['bash -c \"echo 1\necho 2\necho 3\"']);
     });
+
     it('sets the correct ssh args if provided', async function () {
       this.stubs.getInput.withArgs('ssh_args').returns('-vvv -L 80:%INSTANCE%:80');
       await run();
@@ -202,6 +219,7 @@ describe('#ssh-compute', function () {
       expect(this.stubs.info.withArgs('Skipping ssh keys directory cleanup').callCount).to.eq(1);
       expect(this.stubs.rm.callCount).to.eq(0);
     });
+    
     it('deletes the file if env is set in the run function', async function () {
       await run();
       await postRun();
