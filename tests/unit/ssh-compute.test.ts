@@ -5,6 +5,7 @@ import * as exec from '@actions/exec';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 import { expect } from 'chai';
 import { run, parseFlags } from '../../src/main';
+import {run as postRun} from '../../src/post';
 
 import { promises as fs } from 'fs';
 
@@ -54,6 +55,7 @@ describe('#ssh-compute', function () {
         installComponent: sinon.stub(setupGcloud, 'installComponent'),
         getExecOutput: sinon.stub(exec, 'getExecOutput'),
         writeFile: sinon.stub(fs, 'writeFile'),
+        mkdir: sinon.stub(fs, 'mkdir'),
       };
     });
 
@@ -136,6 +138,74 @@ describe('#ssh-compute', function () {
       expect(call).to.be;
       const args = call.args[1];
       expect(args).to.include.members(['--container', 'my-test-container']);
+    });
+    it('sets the temp var dir to env if provided', async function () {
+      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
+      await run();
+      const call = this.stubs.exportVariable.getCall(1);
+      expect(call.args[1]).to.be.equal('temp-dir');
+    });
+    it('sets a random filepath if dir not set', async function () {
+      await run();
+      const call = this.stubs.exportVariable.getCall(1);
+      expect(call.args[1].length).to.be.gt(0);
+    });
+    it('creates folder for the keys', async function () {
+      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
+      await run();
+      expect(this.stubs.mkdir.withArgs('temp-dir').callCount).to.eq(1);
+    });
+    it('writes private key to the folder', async function () {
+      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
+      await run();
+      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(1);
+    });
+    it('writes public key to the folder', async function () {
+      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
+      await run();
+      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(1);
+    });
+    it('sets the correct command if script is provided', async function () {
+      this.stubs.getInput.withArgs('command').returns(undefined);
+      this.stubs.getInput.withArgs('script').returns('script-examples/script.sh');
+      await run();
+      const call = this.stubs.getExecOutput.getCall(0);
+      expect(call).to.be;
+      const args = call.args[1];
+      expect(args).to.include.members(['bash -c \"echo 1\necho 2\necho 3\"']);
+    });
+    it('sets the correct ssh args if provided', async function () {
+      this.stubs.getInput.withArgs('ssh_args').returns('-vvv -L 80:%INSTANCE%:80');
+      await run();
+      const call = this.stubs.getExecOutput.getCall(0);
+      expect(call).to.be;
+      const args = call.args[1];
+      expect(args).to.include.members(['-- -vvv -L 80:%INSTANCE%:80']);
+    });
+  });
+
+  describe('#post run', function () {
+    beforeEach(async function () {
+      this.stubs = {
+        processEnv: sinon.stub(process, 'env'),
+        info: sinon.stub(core, 'info'),
+        rm: sinon.stub(fs, 'rm'),
+      };
+    });
+
+    afterEach(function () {
+      Object.keys(this.stubs).forEach((k) => this.stubs[k].restore());
+    });
+
+    it('does not delete the file if env is not set', async function () {
+      await postRun();
+      expect(this.stubs.info.withArgs('Skipping ssh keys directory cleanup').callCount).to.eq(1);
+      expect(this.stubs.rm.callCount).to.eq(0);
+    });
+    it('deletes the file if env is set in the run function', async function () {
+      await run();
+      await postRun();
+      expect(this.stubs.rm.callCount).to.eq(1);
     });
   });
 

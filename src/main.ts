@@ -101,7 +101,6 @@ export async function run(): Promise<void> {
       '--quiet', // we need to ignore prompts from console
       '--tunnel-through-iap',
     ];
-    // gcloudComponent = gcloudComponent ?? 'beta';
 
     await fs.mkdir(sshKeysDir, { recursive: true });
 
@@ -144,10 +143,6 @@ export async function run(): Promise<void> {
       command = `bash -c \"${commandData}\"`; // eslint-disable-line no-useless-escape
     }
 
-    if (sshArgs) {
-      cmd.push(`-- ${sshArgs}`);
-    }
-
     // Install gcloud if not already installed.
     if (!gcloudVersion || gcloudVersion == 'latest') {
       gcloudVersion = await setupGcloud.getLatestGcloudSDKVersion();
@@ -182,6 +177,11 @@ export async function run(): Promise<void> {
     }
 
     cmd = [...cmd, '--command', command];
+
+    if (sshArgs) {
+      cmd.push(`-- ${sshArgs}`);
+    }
+
     const toolCommand = setupGcloud.getToolCommand();
     const options = { silent: true, ignoreReturnCode: true };
     const commandString = `${toolCommand} ${cmd.join(' ')}`;

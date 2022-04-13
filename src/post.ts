@@ -30,7 +30,7 @@ export async function run(): Promise<void> {
     // We should remove temp directory with ssh keys
     const ssh_keys_dir = process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
     if (!ssh_keys_dir) {
-      logInfo(`Skipping ssh keys directory cleanup`);
+      logInfo('Skipping ssh keys directory cleanup');
       return;
     }
     await fs.rm(ssh_keys_dir, { recursive: true, force: true });
