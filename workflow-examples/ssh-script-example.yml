@@ -17,7 +17,7 @@ on:
     branches:
       - 'main'
 
-name: 'Connect to GCP instance via ssh and execute a command'
+name: 'Connect to GCP instance via ssh and run a script'
 env:
   ZONE: 'us-central1-a'
 
@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: 'Checkout'
-      uses: 'actions/checkout@v2'
+      uses: 'actions/checkout@v3'
 
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
@@ -42,12 +42,12 @@ jobs:
         
     - name: 'SSH to GCP instance'
       id: 'ssh'
-      uses: 'FrodoTheTrue/ssh-compute@action-init'
+      uses: 'google-github-actions/ssh-compute@v0'
       with:
         instance_name: 'instance-name'
         zone: '${{ env.ZONE }}'
         ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
-        command: 'echo Hello world'
+        script: '${{ github.workspace }}/script-examples/script.sh'
 
     - name: 'Show Output'
       run: |-

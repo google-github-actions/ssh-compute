@@ -18,4 +18,4 @@
 export const SSH_KEYS_DEFAULT_TMP_FOLDER = '/tmp/tmp-ssh-keys';
 export const SSH_PUBLIC_KEY_FILENAME = 'google_compute_engine.pub';
 export const SSH_PRIVATE_KEY_FILENAME = 'google_compute_engine';
-export const GOOGLE_SSH_KEYS_TEMP_DIR_VAR = 'GOOGLE_SSH_KEYS_TEMP_DIR';
+export const GOOGLE_SSH_KEYS_TEMP_DIR_VAR = 'GOOGLE_GHA_SSH_KEYS_TEMP_DIR';

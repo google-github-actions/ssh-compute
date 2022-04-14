@@ -93,9 +93,6 @@ See [usage](https://github.com/google-github-actions/auth#usage) for more detail
 #### Authenticating via Workload Identity Federation
 
 ```yaml
-env:
-  ZONE: 'us-central1-a'
-
 jobs:
   job_id:
     permissions:
@@ -103,7 +100,7 @@ jobs:
       id-token: 'write'
 
     steps:
-    - uses: 'actions/checkout@v2'
+    - uses: 'actions/checkout@v3'
 
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
@@ -115,7 +112,7 @@ jobs:
       uses: 'google-github-actions/ssh-compute@v0'
       with:
         instance_name: 'example-instance'
-        zone: '${{ env.ZONE }}'
+        zone: 'us-central1-a'
         ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
         command: 'echo Hello world'
 ```
@@ -123,13 +120,10 @@ jobs:
 #### Authenticating via Service Account Key JSON
 
 ```yaml
-env:
-  ZONE: 'us-central1-a'
-
 jobs:
   job_id:
     steps:
-    - uses: 'actions/checkout@v2'
+    - uses: 'actions/checkout@v3'
 
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
@@ -140,7 +134,7 @@ jobs:
       uses: 'google-github-actions/ssh-compute@v0'
       with:
         instance_name: 'example-instance'
-        zone: '${{ env.ZONE }}'
+        zone: 'us-central1-a'
         ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
         command: 'echo Hello world'
 ```
