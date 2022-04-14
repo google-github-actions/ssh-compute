@@ -25,10 +25,6 @@ This action requires:
 ## Usage
 
 ```yaml
-env:
-  PROJECT_ID: '${{ secrets.GCP_PROJECT }}'
-  ZONE: 'us-central1-a'
-
 jobs:
   job_id:
     permissions:
@@ -48,7 +44,7 @@ jobs:
       uses: 'google-github-actions/ssh-compute@v0'
       with:
         instance_name: 'example-instance'
-        zone: '${{ env.ZONE }}'
+        zone: 'us-central1-a'
         ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
         command: 'echo Hello world'
 
@@ -147,9 +143,6 @@ authenticate requests as the service account attached to the instance. **This
 only works using a custom runner hosted on GCP.**
 
 ```yaml
-env:
-  ZONE: 'us-central1-a'
-
 jobs:
   job_id:
     steps:
@@ -159,7 +152,7 @@ jobs:
       uses: 'google-github-actions/ssh-compute@v0'
       with:
         instance_name: 'example-instance'
-        zone: '${{ env.ZONE }}'
+        zone: 'us-central1-a'
         ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
         command: 'echo Hello world'
 ```
