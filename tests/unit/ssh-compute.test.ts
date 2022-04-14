@@ -6,6 +6,7 @@ import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 import { expect } from 'chai';
 import { run, parseFlags } from '../../src/main';
 import {run as postRun} from '../../src/post';
+import {EOL} from 'os';
 
 import { promises as fs } from 'fs';
 
@@ -188,7 +189,7 @@ describe('#ssh-compute', function () {
       const call = this.stubs.getExecOutput.getCall(0);
       expect(call).to.be;
       const args = call.args[1];
-      expect(args).to.include.members(['bash -c \"echo 1\necho 2\necho 3\"']);
+      expect(args).to.include.members([`bash -c \"echo 1${EOL}echo 2${EOL}echo 3\"`]);
     });
 
     it('sets the correct ssh args if provided', async function () {
@@ -219,7 +220,7 @@ describe('#ssh-compute', function () {
       expect(this.stubs.info.withArgs('Skipping ssh keys directory cleanup').callCount).to.eq(1);
       expect(this.stubs.rm.callCount).to.eq(0);
     });
-    
+
     it('deletes the file if env is set in the run function', async function () {
       await run();
       await postRun();
