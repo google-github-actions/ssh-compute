@@ -4,9 +4,9 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 import { expect } from 'chai';
-import { run, parseFlags } from '../../src/main';
-import {run as postRun} from '../../src/post';
-import {EOL} from 'os';
+import { run } from '../../src/main';
+import { run as postRun } from '../../src/post';
+import { EOL } from 'os';
 
 import { promises as fs } from 'fs';
 
@@ -36,7 +36,7 @@ const fakeInputs: { [key: string]: string } = {
 };
 
 function getInputMock(name: string): string {
-    return fakeInputs[name];
+  return fakeInputs[name];
 }
 
 describe('#ssh-compute', function () {
@@ -95,8 +95,9 @@ describe('#ssh-compute', function () {
       this.stubs.getInput.withArgs('gcloud_component').returns('wrong_value');
       await run();
       expect(
-        this.stubs.setFailed.withArgs(`${ERROR_PREFIX} invalid input received for gcloud_component: wrong_value`)
-          .callCount,
+        this.stubs.setFailed.withArgs(
+          `${ERROR_PREFIX} invalid input received for gcloud_component: wrong_value`,
+        ).callCount,
       ).to.be.at.least(1);
     });
 
@@ -117,8 +118,9 @@ describe('#ssh-compute', function () {
       this.stubs.getInput.withArgs('command').returns('test command');
       await run();
       expect(
-        this.stubs.setFailed.withArgs(`${ERROR_PREFIX} either \`command\` or \`script\` should be set`)
-          .callCount,
+        this.stubs.setFailed.withArgs(
+          `${ERROR_PREFIX} either \`command\` or \`script\` should be set`,
+        ).callCount,
       ).to.be.at.least(1);
     });
 
@@ -126,8 +128,9 @@ describe('#ssh-compute', function () {
       this.stubs.getInput.withArgs('command').returns(undefined);
       await run();
       expect(
-        this.stubs.setFailed.withArgs(`${ERROR_PREFIX} either \`command\` or \`script\` should be set`)
-          .callCount,
+        this.stubs.setFailed.withArgs(
+          `${ERROR_PREFIX} either \`command\` or \`script\` should be set`,
+        ).callCount,
       ).to.be.at.least(1);
     });
 
@@ -173,13 +176,17 @@ describe('#ssh-compute', function () {
     it('writes private key to the folder', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
-      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(1);
+      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(
+        1,
+      );
     });
 
     it('writes public key to the folder', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
-      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(1);
+      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(
+        1,
+      );
     });
 
     it('sets the correct command if script is provided', async function () {
@@ -225,78 +232,6 @@ describe('#ssh-compute', function () {
       await run();
       await postRun();
       expect(this.stubs.rm.callCount).to.eq(1);
-    });
-  });
-
-  describe('#parseFlags', () => {
-    const cases = [
-      {
-        name: `with equals`,
-        input: `--concurrency=2 --memory=2Gi`,
-        exp: [`--concurrency`, `2`, `--memory`, `2Gi`],
-      },
-      {
-        name: `with spaces`,
-        input: `--concurrency 2 --memory 2Gi`,
-        exp: [`--concurrency`, `2`, `--memory`, `2Gi`],
-      },
-      {
-        name: `with equals and spaces`,
-        input: `--concurrency 2 --memory=2Gi`,
-        exp: [`--concurrency`, `2`, `--memory`, `2Gi`],
-      },
-      {
-        name: `with equals and double quotes`,
-        input: `--memory="2Gi"`,
-        exp: [`--memory`, `"2Gi"`],
-      },
-      {
-        name: `with space and double quotes`,
-        input: `--memory "2Gi"`,
-        exp: [`--memory`, `"2Gi"`],
-      },
-      {
-        name: `with equals and space and double quotes`,
-        input: `--memory="2Gi" --concurrency "2"`,
-        exp: [`--memory`, `"2Gi"`, `--concurrency`, `"2"`],
-      },
-      {
-        name: `with equals and space and some double quotes`,
-        input: `--memory="2Gi" --concurrency 2`,
-        exp: [`--memory`, `"2Gi"`, `--concurrency`, `2`],
-      },
-      {
-        name: `with equals and single quotes`,
-        input: `--memory='2Gi'`,
-        exp: [`--memory`, `'2Gi'`],
-      },
-      {
-        name: `with space and single quotes`,
-        input: `--memory '2Gi'`,
-        exp: [`--memory`, `'2Gi'`],
-      },
-      {
-        name: `with equals and space and single quotes`,
-        input: `--memory='2Gi' --concurrency '2'`,
-        exp: [`--memory`, `'2Gi'`, `--concurrency`, `'2'`],
-      },
-      {
-        name: `with equals and space and some single quotes`,
-        input: `--memory='2Gi' --concurrency 2`,
-        exp: [`--memory`, `'2Gi'`, `--concurrency`, `2`],
-      },
-      {
-        name: `with double and single quotes`,
-        input: `--memory='2Gi' --concurrency="2"`,
-        exp: [`--memory`, `'2Gi'`, `--concurrency`, `"2"`],
-      },
-    ];
-
-    cases.forEach((tc) => {
-      it(tc.name, () => {
-        const result = parseFlags(tc.input);
-        expect(result).to.eql(tc.exp);
-      });
     });
   });
 });
