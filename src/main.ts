@@ -24,12 +24,13 @@ import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 import {
+  errorMessage,
   exactlyOneOf,
   isPinnedToHead,
+  parseFlags,
   pinnedToHeadWarning,
-  errorMessage,
-  randomFilepath,
   presence,
+  randomFilepath,
 } from '@google-github-actions/actions-utils';
 
 import sshpk from 'sshpk';
@@ -42,10 +43,6 @@ import {
 
 export const GCLOUD_METRICS_ENV_VAR = 'CLOUDSDK_METRICS_ENVIRONMENT';
 export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
-
-export function parseFlags(flags: string): RegExpMatchArray {
-  return flags.match(/(".*?"|[^"\s=]+)+(?=\s*|\s*$)/g)!; // Split on space or "=" if not in quotes
-}
 
 export async function run(): Promise<void> {
   try {
