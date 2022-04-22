@@ -40,7 +40,37 @@ jobs:
       name: 'ssh-compute'
       uses: './'
       with:
-        instance_name: 'instance-abba'
+        instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
+        zone: 'us-central1-a'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
+
+    - name: 'outputs'
+      run: echo '${{ steps.ssh-compute.outputs.stdout }}${{ steps.ssh-compute.outputs.stderr }}'
+
+  auth_credentials:
+    if: ${{ github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name && github.actor != 'dependabot[bot]' }}
+    name: 'auth_credentials'
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - uses: 'actions/setup-node@v2'
+      with:
+        node-version: '16.x'
+
+    - name: 'npm build'
+      run: 'npm ci && npm run build'
+
+    - uses: 'google-github-actions/auth@main'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - id: 'ssh-compute'
+      name: 'ssh-compute'
+      uses: './'
+      with:
+        instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
         zone: 'us-central1-a'
         ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
         command: 'echo Hello world'
