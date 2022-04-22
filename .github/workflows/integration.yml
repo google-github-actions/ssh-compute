@@ -1,0 +1,49 @@
+name: 'integration'
+
+on:
+  push:
+    branches:
+    - 'main'
+  pull_request:
+    branches:
+    - 'main'
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  auth_workload_identity_federation:
+    if: ${{ github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name && github.actor != 'dependabot[bot]' }}
+    name: 'auth_workload_identity_federation'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - uses: 'actions/setup-node@v2'
+      with:
+        node-version: '16.x'
+
+    - name: 'npm build'
+      run: 'npm ci && npm run build'
+
+    - uses: 'google-github-actions/auth@main'
+      with:
+        workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+        service_account: '${{ secrets.SSH_COMPUTE_SA_EMAIL }}'
+
+    - id: 'ssh-compute'
+      name: 'ssh-compute'
+      uses: './'
+      with:
+        instance_name: 'instance-abba'
+        zone: 'us-central1-a'
+        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        command: 'echo Hello world'
+
+    - name: 'outputs'
+      run: echo '${{ steps.ssh-compute.outputs.stdout }}${{ steps.ssh-compute.outputs.stderr }}'
