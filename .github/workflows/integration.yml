@@ -33,7 +33,7 @@ jobs:
 
     - uses: 'google-github-actions/auth@main'
       with:
-        workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+        workload_identity_provider: '${{ secrets.WIF_PROVIDER_NAME }}'
         service_account: '${{ secrets.SSH_COMPUTE_SA_EMAIL }}'
 
     - id: 'ssh-compute'
@@ -97,7 +97,7 @@ jobs:
 
     - uses: 'google-github-actions/auth@main'
       with:
-        workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+        workload_identity_provider: '${{ secrets.WIF_PROVIDER_NAME }}'
         service_account: '${{ secrets.SSH_COMPUTE_SA_EMAIL }}'
 
     - id: 'ssh-compute'
