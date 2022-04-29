@@ -42,7 +42,7 @@ jobs:
       with:
         instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
         zone: 'us-central1-a'
-        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        ssh_private_key: '${{ secrets.SSH_COMPUTE_PRIVATE_KEY }}'
         command: 'uname -r'
 
     - name: 'outputs'
@@ -72,7 +72,7 @@ jobs:
       with:
         instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
         zone: 'us-central1-a'
-        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        ssh_private_key: '${{ secrets.SSH_COMPUTE_PRIVATE_KEY }}'
         command: 'uname -r'
 
     - name: 'outputs'
@@ -106,7 +106,7 @@ jobs:
       with:
         instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
         zone: 'us-central1-a'
-        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        ssh_private_key: '${{ secrets.SSH_COMPUTE_PRIVATE_KEY }}'
         script: '${{ github.workspace }}/script-examples/script.sh'
 
     - name: 'outputs'
