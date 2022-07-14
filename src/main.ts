@@ -111,20 +111,29 @@ export async function run(): Promise<void> {
     });
 
     // Get public key from the private key
+    const privateKeyObject = sshpk.parsePrivateKey(correctPrivateKeyData, 'ssh-private');
+
     const pubKeyObject = createPublicKey({
-      key: sshpk.parsePrivateKey(correctPrivateKeyData, 'ssh').toBuffer('pkcs8').toString(),
+      key: privateKeyObject.toBuffer('pem').toString(),
       format: 'pem',
     });
 
-    const publicKey = pubKeyObject.export({
+    const publicKeyPem = pubKeyObject.export({
       format: 'pem',
       type: 'spki',
     });
 
-    await fs.writeFile(`${sshKeysDir}/${SSH_PUBLIC_KEY_FILENAME}`, publicKey, {
-      mode: 0o644,
-      flag: 'wx',
-    });
+    const publicKeyPemObject = sshpk.parseKey(publicKeyPem);
+    publicKeyPemObject.comment = privateKeyObject.comment;
+
+    await fs.writeFile(
+      `${sshKeysDir}/${SSH_PUBLIC_KEY_FILENAME}`,
+      publicKeyPemObject.toString('ssh'),
+      {
+        mode: 0o644,
+        flag: 'wx',
+      },
+    );
 
     if (container) {
       cmd.push('--container', container);
