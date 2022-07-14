@@ -1,0 +1,113 @@
+name: 'integration'
+
+on:
+  push:
+    branches:
+    - 'main'
+  pull_request:
+    branches:
+    - 'main'
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  auth_workload_identity_federation:
+    if: ${{ github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name && github.actor != 'dependabot[bot]' }}
+    name: 'auth_workload_identity_federation'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '16.x'
+
+    - name: 'npm build'
+      run: 'npm ci && npm run build'
+
+    - uses: 'google-github-actions/auth@main'
+      with:
+        workload_identity_provider: '${{ secrets.WIF_PROVIDER_NAME }}'
+        service_account: '${{ secrets.SSH_COMPUTE_SA_EMAIL }}'
+
+    - id: 'ssh-compute'
+      name: 'ssh-compute'
+      uses: './'
+      with:
+        instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
+        zone: 'us-central1-a'
+        ssh_private_key: '${{ secrets.SSH_COMPUTE_PRIVATE_KEY }}'
+        command: 'uname -r'
+
+    - name: 'outputs'
+      run: echo '${{ steps.ssh-compute.outputs.stdout }}${{ steps.ssh-compute.outputs.stderr }}'
+
+  auth_credentials:
+    if: ${{ github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name && github.actor != 'dependabot[bot]' }}
+    name: 'auth_credentials'
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '16.x'
+
+    - name: 'npm build'
+      run: 'npm ci && npm run build'
+
+    - uses: 'google-github-actions/auth@main'
+      with:
+        credentials_json: '${{ secrets.SSH_COMPUTE_SA_KEY_B64 }}'
+
+    - id: 'ssh-compute'
+      name: 'ssh-compute'
+      uses: './'
+      with:
+        instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
+        zone: 'us-central1-a'
+        ssh_private_key: '${{ secrets.SSH_COMPUTE_PRIVATE_KEY }}'
+        command: 'uname -r'
+
+    - name: 'outputs'
+      run: echo '${{ steps.ssh-compute.outputs.stdout }}${{ steps.ssh-compute.outputs.stderr }}'
+
+  script_command:
+    if: ${{ github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name && github.actor != 'dependabot[bot]' }}
+    name: 'script_command'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '16.x'
+
+    - name: 'npm build'
+      run: 'npm ci && npm run build'
+
+    - uses: 'google-github-actions/auth@main'
+      with:
+        workload_identity_provider: '${{ secrets.WIF_PROVIDER_NAME }}'
+        service_account: '${{ secrets.SSH_COMPUTE_SA_EMAIL }}'
+
+    - id: 'ssh-compute'
+      name: 'ssh-compute'
+      uses: './'
+      with:
+        instance_name: '${{ secrets.SSH_COMPUTE_IAP_VM_NAME }}'
+        zone: 'us-central1-a'
+        ssh_private_key: '${{ secrets.SSH_COMPUTE_PRIVATE_KEY }}'
+        script: '${{ github.workspace }}/script-examples/script.sh'
+
+    - name: 'outputs'
+      run: echo '${{ steps.ssh-compute.outputs.stdout }}${{ steps.ssh-compute.outputs.stderr }}'
