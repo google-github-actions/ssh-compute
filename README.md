@@ -66,8 +66,8 @@ jobs:
 | `ssh_keys_dir`| _optional_ | Random directory in the temp folder | Path for a directory to store ssh keys. |
 | `container`| _optional_ | | The name or ID of a container inside of the virtual machine instance to connect to. This only applies to virtual machines that are using a Google Container-Optimized virtual machine image. |
 | `ssh_args`| _optional_ | | Additional flags to be passed to ssh tool. Example: '-vvv -L 80:%INSTANCE%:80'. |
-| `command`| _optional_ | | Name of the virtual machine instance to SSH into. |
-| `script`| _optional_ | | A command to run on the virtual machine. Action runs the command on the target instance and then exits. You must specify at least command or script, specifying both command and script is invalid. |
+| `command`| _optional_ | | A command to run on the virtual machine. Action runs the command on the target instance and then exits. You must specify at least command or script, specifying both command and script is invalid. |
+| `script`| _optional_ | | A script file to run on the virtual machine. Action runs the script on the target instance and then exits. You must specify at least command or script, specifying both command and script is invalid. |
 | `project_id`| _optional_ | | The GCP project ID. Overrides project ID set by credentials. |
 | `flags`| _optional_ | | Space separated list of other compute ssh flags, examples can be found: https://cloud.google.com/sdk/gcloud/reference/compute/ssh/#FLAGS. Ex  --ssh-key-expiration=2017-08-29T18:52:51.142Z. |
 | `gcloud_version`| _optional_ | | Version of the Cloud SDK to install. If unspecified or set to "latest", the latest available gcloud SDK version for the target platform will be installed. Example: "290.0.1". |
