@@ -15,10 +15,8 @@
  */
 'use strict';
 
-import { promises as fs } from 'fs';
-
 import { info as logInfo } from '@actions/core';
-import { errorMessage } from '@google-github-actions/actions-utils';
+import { errorMessage, forceRemove } from '@google-github-actions/actions-utils';
 
 import { GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from './const';
 
@@ -27,13 +25,15 @@ import { GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from './const';
  */
 export async function run(): Promise<void> {
   try {
-    // We should remove temp directory with ssh keys
+    // We should remove temp directory with ssh keys.
     const ssh_keys_dir = process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
     if (!ssh_keys_dir) {
       logInfo('Skipping ssh keys directory cleanup');
       return;
     }
-    await fs.rm(ssh_keys_dir, { recursive: true, force: true });
+
+    // Remove the file.
+    await forceRemove(ssh_keys_dir);
     delete process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
   } catch (err) {
     const msg = errorMessage(err);
