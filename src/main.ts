@@ -19,10 +19,25 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import { createPublicKey } from 'crypto';
 
-import * as core from '@actions/core';
-import * as exec from '@actions/exec';
+import {
+  addPath,
+  exportVariable,
+  getInput,
+  info as logInfo,
+  setFailed,
+  setOutput,
+  warning as logWarning,
+} from '@actions/core';
+import { getExecOutput } from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
-import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
+import {
+  authenticateGcloudSDK,
+  getLatestGcloudSDKVersion,
+  getToolCommand,
+  installComponent as installGcloudComponent,
+  installGcloudSDK,
+  isInstalled as isGcloudInstalled,
+} from '@google-github-actions/setup-cloud-sdk';
 import {
   errorMessage,
   exactlyOneOf,
@@ -46,33 +61,29 @@ export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
 
 export async function run(): Promise<void> {
   try {
-    core.exportVariable(GCLOUD_METRICS_ENV_VAR, GCLOUD_METRICS_LABEL);
+    exportVariable(GCLOUD_METRICS_ENV_VAR, GCLOUD_METRICS_LABEL);
 
     // Warn if pinned to HEAD
     if (isPinnedToHead()) {
-      core.warning(pinnedToHeadWarning('v0'));
+      logWarning(pinnedToHeadWarning('v0'));
     }
 
     // Get inputs
-    // Core inputs
-    let instanceName = core.getInput('instance_name');
-    const zone = core.getInput('zone');
-    const user = core.getInput('user');
-    const sshPrivateKey = core.getInput('ssh_private_key');
-    const sshKeysDir = core.getInput('ssh_keys_dir') || randomFilepath();
-    const container = core.getInput('container');
-    const sshArgs = core.getInput('ssh_args');
-    let command = core.getInput('command');
-    const script = core.getInput('script');
-    const projectID = core.getInput('project_id');
-    let gcloudVersion = core.getInput('gcloud_version');
-    const gcloudComponent = presence(core.getInput('gcloud_component'));
+    const instanceName = getInput('instance_name');
+    const zone = getInput('zone');
+    const user = getInput('user');
+    const sshPrivateKey = getInput('ssh_private_key');
+    const sshKeysDir = getInput('ssh_keys_dir') || randomFilepath();
+    const container = getInput('container');
+    const sshArgs = getInput('ssh_args');
+    let command = getInput('command');
+    const script = getInput('script');
+    const projectID = getInput('project_id');
+    const gcloudVersion = await computeGcloudVersion(getInput('gcloud_version'));
+    const gcloudComponent = presence(getInput('gcloud_component'));
+    const flags = getInput('flags');
 
-    core.exportVariable(GOOGLE_SSH_KEYS_TEMP_DIR_VAR, sshKeysDir);
-
-    // Flags
-    const flags = core.getInput('flags');
-    let cmd;
+    exportVariable(GOOGLE_SSH_KEYS_TEMP_DIR_VAR, sshKeysDir);
 
     if (!exactlyOneOf(command, script)) {
       throw new Error('either `command` or `script` should be set');
@@ -83,21 +94,7 @@ export async function run(): Promise<void> {
       throw new Error(`invalid input received for gcloud_component: ${gcloudComponent}`);
     }
 
-    if (user) {
-      instanceName = `${user}@${instanceName}`;
-    }
-
-    cmd = [
-      'compute',
-      'ssh',
-      instanceName,
-      '--zone',
-      zone,
-      '--ssh-key-file',
-      `${sshKeysDir}/${SSH_PRIVATE_KEY_FILENAME}`,
-      '--quiet', // we need to ignore prompts from console
-      '--tunnel-through-iap',
-    ];
+    const instanceTarget = presence(user) ? `${user}@${instanceName}` : instanceName;
 
     await fs.mkdir(sshKeysDir, { recursive: true });
 
@@ -135,51 +132,52 @@ export async function run(): Promise<void> {
       },
     );
 
-    if (container) {
-      cmd.push('--container', container);
+    let cmd = [
+      'compute',
+      'ssh',
+      instanceTarget,
+      '--zone',
+      zone,
+      '--ssh-key-file',
+      `${sshKeysDir}/${SSH_PRIVATE_KEY_FILENAME}`,
+      '--quiet', // we need to ignore prompts from console
+      '--tunnel-through-iap',
+    ];
+
+    if (container) cmd.push('--container', container);
+    if (projectID) cmd.push('--project', projectID);
+    if (script) {
+      const commandData = (await fs.readFile(script)).toString('utf8');
+      command = `bash -c "${commandData}"`;
     }
 
+    // Add optional flags
     if (flags) {
-      const flagList = parseFlags(flags.replace('\n', ' '));
+      const flagList = parseFlags(flags);
       if (flagList) cmd = cmd.concat(flagList);
     }
 
-    if (script) {
-      const commandData = (await fs.readFile(script)).toString('utf8');
-      command = `bash -c \"${commandData}\"`; // eslint-disable-line no-useless-escape
-    }
-
     // Install gcloud if not already installed.
-    if (!gcloudVersion || gcloudVersion == 'latest') {
-      gcloudVersion = await setupGcloud.getLatestGcloudSDKVersion();
-    }
-    if (!setupGcloud.isInstalled(gcloudVersion)) {
-      await setupGcloud.installGcloudSDK(gcloudVersion);
+    if (!isGcloudInstalled(gcloudVersion)) {
+      await installGcloudSDK(gcloudVersion);
     } else {
       const toolPath = toolCache.find('gcloud', gcloudVersion);
-      core.addPath(path.join(toolPath, 'bin'));
-    }
-
-    // Authenticate gcloud SDK.
-    await setupGcloud.authenticateGcloudSDK();
-    const authenticated = await setupGcloud.isAuthenticated();
-    if (!authenticated) {
-      throw new Error('Error authenticating the Cloud SDK.');
-    }
-
-    // set PROJECT ID
-    if (projectID) cmd.push('--project', projectID);
-
-    // Fail if no Project Id is provided if not already set.
-    const projectIdSet = await setupGcloud.isProjectIdSet();
-    if (!projectIdSet) {
-      throw new Error('No project Id provided.');
+      addPath(path.join(toolPath, 'bin'));
     }
 
     // Install gcloud component if needed and prepend the command
     if (gcloudComponent) {
-      await setupGcloud.installComponent(gcloudComponent);
+      await installGcloudComponent(gcloudComponent);
       cmd.unshift(gcloudComponent);
+    }
+
+    // Authenticate - this comes from google-github-actions/auth.
+    const credFile = process.env.GOOGLE_GHA_CREDS_PATH;
+    if (credFile) {
+      await authenticateGcloudSDK(credFile);
+      logInfo('Successfully authenticated');
+    } else {
+      logWarning('No authentication found, authenticate with `google-github-actions/auth`.');
     }
 
     cmd = [...cmd, '--command', command];
@@ -188,15 +186,15 @@ export async function run(): Promise<void> {
       cmd.push(`-- ${sshArgs}`);
     }
 
-    const toolCommand = setupGcloud.getToolCommand();
+    const toolCommand = getToolCommand();
     const options = { silent: true, ignoreReturnCode: true };
     const commandString = `${toolCommand} ${cmd.join(' ')}`;
-    core.info(`Running: ${commandString}`);
+    logInfo(`Running: ${commandString}`);
 
-    const output = await exec.getExecOutput(toolCommand, cmd, options);
+    const output = await getExecOutput(toolCommand, cmd, options);
 
-    core.setOutput('stdout', output.stdout);
-    core.setOutput('stderr', output.stderr);
+    setOutput('stdout', output.stdout);
+    setOutput('stderr', output.stderr);
 
     if (output.exitCode !== 0) {
       const errMsg = output.stderr || `command exited ${output.exitCode}, but stderr had no output`;
@@ -204,8 +202,20 @@ export async function run(): Promise<void> {
     }
   } catch (err) {
     const msg = errorMessage(err);
-    core.setFailed(`google-github-actions/ssh-compute failed with: ${msg}`);
+    setFailed(`google-github-actions/ssh-compute failed with: ${msg}`);
   }
+}
+
+/**
+ * computeGcloudVersion computes the appropriate gcloud version for the given
+ * string.
+ */
+async function computeGcloudVersion(str: string): Promise<string> {
+  str = (str || '').trim();
+  if (str === '' || str === 'latest') {
+    return await getLatestGcloudSDKVersion();
+  }
+  return str;
 }
 
 if (require.main === module) {

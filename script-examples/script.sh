@@ -1,3 +1,3 @@
-echo 1
-echo 2
+echo -n 1
+echo -n 2
 echo 3
