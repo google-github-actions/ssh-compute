@@ -46,6 +46,7 @@ import {
   pinnedToHeadWarning,
   presence,
   randomFilepath,
+  stubEnv,
 } from '@google-github-actions/actions-utils';
 
 import sshpk from 'sshpk';
@@ -56,18 +57,24 @@ import {
   GOOGLE_SSH_KEYS_TEMP_DIR_VAR,
 } from './const';
 
-export const GCLOUD_METRICS_ENV_VAR = 'CLOUDSDK_METRICS_ENVIRONMENT';
-export const GCLOUD_METRICS_LABEL = 'github-actions-ssh-compute';
+// Do not listen to the linter - this can NOT be rewritten as an ES6 import
+// statement.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version: appVersion } = require('../package.json');
 
 export async function run(): Promise<void> {
+  // Register metrics
+  const restoreEnv = stubEnv({
+    CLOUDSDK_METRICS_ENVIRONMENT: 'github-actions-ssh-compute',
+    CLOUDSDK_METRICS_ENVIRONMENT_VERSION: appVersion,
+  });
+
+  // Warn if pinned to HEAD
+  if (isPinnedToHead()) {
+    logWarning(pinnedToHeadWarning('v0'));
+  }
+
   try {
-    exportVariable(GCLOUD_METRICS_ENV_VAR, GCLOUD_METRICS_LABEL);
-
-    // Warn if pinned to HEAD
-    if (isPinnedToHead()) {
-      logWarning(pinnedToHeadWarning('v0'));
-    }
-
     // Get inputs
     const instanceName = getInput('instance_name');
     const zone = getInput('zone');
@@ -203,6 +210,8 @@ export async function run(): Promise<void> {
   } catch (err) {
     const msg = errorMessage(err);
     setFailed(`google-github-actions/ssh-compute failed with: ${msg}`);
+  } finally {
+    restoreEnv();
   }
 }
 
