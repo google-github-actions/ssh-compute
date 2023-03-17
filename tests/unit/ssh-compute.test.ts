@@ -172,13 +172,13 @@ describe('#ssh-compute', function () {
     it('sets the temp var dir to env if provided', async function () {
       this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
       await run();
-      const call = this.stubs.exportVariable.getCall(1);
+      const call = this.stubs.exportVariable.getCall(0);
       expect(call.args[1]).to.be.equal('temp-dir');
     });
 
     it('sets a random filepath if dir not set', async function () {
       await run();
-      const call = this.stubs.exportVariable.getCall(1);
+      const call = this.stubs.exportVariable.getCall(0);
       expect(call.args[1].length).to.be.gt(0);
     });
 
