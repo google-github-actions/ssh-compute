@@ -5,8 +5,13 @@ via ssh and execute user’s commands.
 
 You should enable IAP TCP forwarding to establish an encrypted tunnel over which you can forward SSH connections to the VM.
 
-Note, this action does not work when connecting to Windows VMs. 
+Note, this action does not work when connecting to Windows VMs.
 Please, check [this guide](https://cloud.google.com/compute/docs/instances/connecting-to-windows) to know more how to connect to a Windows instance.
+
+**This is not an officially supported Google product, and it is not covered by a
+Google Cloud support contract. To report bugs or request features in a Google
+Cloud product, please contact [Google Cloud
+support](https://cloud.google.com/support).**
 
 ## Prerequisites
 
