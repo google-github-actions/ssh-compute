@@ -37,10 +37,10 @@ jobs:
       id-token: 'write'
 
     steps:
-    - uses: 'actions/checkout@v2'
+    - uses: 'actions/checkout@v4'
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
+      uses: 'google-github-actions/auth@v1'
       with:
         workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
@@ -101,10 +101,10 @@ jobs:
       id-token: 'write'
 
     steps:
-    - uses: 'actions/checkout@v3'
+    - uses: 'actions/checkout@v4'
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
+      uses: 'google-github-actions/auth@v1'
       with:
         workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
@@ -124,10 +124,10 @@ jobs:
 jobs:
   job_id:
     steps:
-    - uses: 'actions/checkout@v3'
+    - uses: 'actions/checkout@v4'
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
+      uses: 'google-github-actions/auth@v1'
       with:
         credentials_json: '${{ secrets.gcp_credentials }}'
 
@@ -151,7 +151,7 @@ only works using a custom runner hosted on GCP.**
 jobs:
   job_id:
     steps:
-    - uses: 'actions/checkout@v2'
+    - uses: 'actions/checkout@v4'
 
     - id: 'compute-ssh'
       uses: 'google-github-actions/ssh-compute@v0'
