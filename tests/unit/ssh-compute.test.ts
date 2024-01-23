@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-import 'mocha';
-import { expect } from 'chai';
-import * as sinon from 'sinon';
+import { mock, test } from 'node:test';
+import assert from 'node:assert';
 
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 import { TestToolCache } from '@google-github-actions/setup-cloud-sdk';
-import { errorMessage } from '@google-github-actions/actions-utils';
+
+import { assertMembers } from '@google-github-actions/actions-utils';
 
 import { run } from '../../src/main';
-import { GOOGLE_SSH_KEYS_TEMP_DIR_VAR } from '../../src/const';
 import { EOL } from 'os';
 
 import { promises as fs } from 'fs';
@@ -43,194 +42,250 @@ YWwBAg==
 const fakeInputs: { [key: string]: string } = {
   instance_name: 'hello-world-instance',
   zone: 'us-central1-a',
-  user: '',
   ssh_private_key: TEST_SSH_PRIVATE_KEY,
-  ssh_keys_dir: '',
-  container: '',
-  ssh_args: '',
   command: 'echo Hello world',
-  project_id: '',
-  gcloud_version: '',
 };
 
-function getInputMock(name: string): string {
-  return fakeInputs[name];
-}
+const defaultMocks = (
+  m: typeof mock,
+  overrideInputs?: Record<string, string>,
+): Record<string, any> => {
+  const inputs = Object.assign({}, fakeInputs, overrideInputs);
+  return {
+    setFailed: m.method(core, 'setFailed', (msg: string) => {
+      throw new Error(msg);
+    }),
+    getBooleanInput: m.method(core, 'getBooleanInput', (name: string) => {
+      return !!inputs[name];
+    }),
+    getMultilineInput: m.method(core, 'getMultilineInput', (name: string) => {
+      return inputs[name];
+    }),
+    getInput: m.method(core, 'getInput', (name: string) => {
+      return inputs[name];
+    }),
+    getExecOutput: m.method(exec, 'getExecOutput', () => {
+      return { exitCode: 0, stderr: '', stdout: '{}' };
+    }),
 
-describe('#ssh-compute', function () {
-  beforeEach(async function () {
+    authenticateGcloudSDK: m.method(setupGcloud, 'authenticateGcloudSDK', () => {}),
+    isAuthenticated: m.method(setupGcloud, 'isAuthenticated', () => {}),
+    isInstalled: m.method(setupGcloud, 'isInstalled', () => {
+      return true;
+    }),
+    installGcloudSDK: m.method(setupGcloud, 'installGcloudSDK', async () => {
+      return '1.2.3';
+    }),
+    installComponent: m.method(setupGcloud, 'installComponent', () => {}),
+    setProject: m.method(setupGcloud, 'setProject', () => {}),
+    getLatestGcloudSDKVersion: m.method(setupGcloud, 'getLatestGcloudSDKVersion', () => {
+      return '1.2.3';
+    }),
+
+    mkdir: m.method(fs, 'mkdir', (a: string) => {
+      return a;
+    }),
+    writeFile: m.method(fs, 'writeFile', (a: string) => {
+      return a;
+    }),
+  };
+};
+
+test('#run', { concurrency: true }, async (suite) => {
+  const originalEnv = Object.assign({}, process.env);
+
+  suite.before(async () => {
+    suite.mock.method(core, 'debug', () => {});
+    suite.mock.method(core, 'info', () => {});
+    suite.mock.method(core, 'warning', () => {});
+    suite.mock.method(core, 'setOutput', () => {});
+    suite.mock.method(core, 'setSecret', () => {});
+    suite.mock.method(core, 'group', () => {});
+    suite.mock.method(core, 'startGroup', () => {});
+    suite.mock.method(core, 'endGroup', () => {});
+    suite.mock.method(core, 'addPath', () => {});
+    suite.mock.method(core, 'exportVariable', () => {});
+  });
+
+  suite.beforeEach(async () => {
     await TestToolCache.start();
-
-    this.stubs = {
-      authenticateGcloudSDK: sinon.stub(setupGcloud, 'authenticateGcloudSDK'),
-      exportVariable: sinon.stub(core, 'exportVariable'),
-      getBooleanInput: sinon.stub(core, 'getBooleanInput').returns(false),
-      getInput: sinon.stub(core, 'getInput').callsFake(getInputMock),
-      getLatestGcloudSDKVersion: sinon
-        .stub(setupGcloud, 'getLatestGcloudSDKVersion')
-        .resolves('1.2.3'),
-      getExecOutput: sinon
-        .stub(exec, 'getExecOutput')
-        .resolves({ exitCode: 0, stderr: '', stdout: '{}' }),
-      isInstalled: sinon.stub(setupGcloud, 'isInstalled').returns(true),
-      installGcloudSDK: sinon.stub(setupGcloud, 'installGcloudSDK'),
-      installComponent: sinon.stub(setupGcloud, 'installComponent'),
-      mkdir: sinon.stub(fs, 'mkdir'),
-      processEnv: sinon.stub(process, 'env'),
-      setOutput: sinon.stub(core, 'setOutput'),
-      writeFile: sinon.stub(fs, 'writeFile'),
-    };
-
-    sinon.stub(core, 'addPath').callsFake(sinon.fake());
-    sinon.stub(core, 'debug').callsFake(sinon.fake());
-    sinon.stub(core, 'endGroup').callsFake(sinon.fake());
-    sinon.stub(core, 'info').callsFake(sinon.fake());
-    sinon.stub(core, 'setFailed').throwsArg(0); // make setFailed throw exceptions
-    sinon.stub(core, 'startGroup').callsFake(sinon.fake());
-    sinon.stub(core, 'warning').callsFake(sinon.fake());
   });
 
-  afterEach(async function () {
+  suite.afterEach(async () => {
+    process.env = originalEnv;
     await TestToolCache.stop();
-    Object.keys(this.stubs).forEach((k) => this.stubs[k].restore());
-    delete process.env[GOOGLE_SSH_KEYS_TEMP_DIR_VAR];
-    sinon.restore();
   });
 
-  describe('#run', function () {
-    it('sets the project ID if provided', async function () {
-      this.stubs.getInput.withArgs('project_id').returns('my-test-project');
+  await suite.test('sets the project ID if provided', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      project_id: 'my-test-project',
+    });
+    await run();
+
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assertMembers(args, ['--project', 'my-test-project']);
+  });
+
+  await suite.test('installs the gcloud SDK if it is not already installed', async (t) => {
+    const mocks = defaultMocks(t.mock);
+    t.mock.method(setupGcloud, 'isInstalled', () => {
+      return false;
+    });
+
+    await run();
+
+    assert.deepStrictEqual(mocks.installGcloudSDK.mock.callCount(), 1);
+  });
+
+  await suite.test('uses the cached gcloud SDK if it was already installed', async (t) => {
+    const mocks = defaultMocks(t.mock);
+    t.mock.method(setupGcloud, 'isInstalled', () => {
+      return true;
+    });
+
+    await run();
+
+    assert.deepStrictEqual(mocks.installGcloudSDK.mock.callCount(), 0);
+  });
+
+  await suite.test('uses default components without gcloud_component flag', async (t) => {
+    const mocks = defaultMocks(t.mock);
+
+    await run();
+
+    assert.deepStrictEqual(mocks.installComponent.mock.callCount(), 0);
+  });
+
+  await suite.test('installs alpha component with alpha flag', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      gcloud_component: 'alpha',
+    });
+
+    await run();
+
+    const args = mocks.installComponent.mock.calls?.at(0).arguments?.at(0);
+    assert.deepStrictEqual(args, 'alpha');
+  });
+
+  await suite.test('installs alpha component with beta flag', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      gcloud_component: 'beta',
+    });
+
+    await run();
+
+    const args = mocks.installComponent.mock.calls?.at(0).arguments?.at(0);
+    assert.deepStrictEqual(args, 'beta');
+  });
+
+  await suite.test('throws error with invalid gcloud component flag', async (t) => {
+    defaultMocks(t.mock, {
+      gcloud_component: 'wrong_value',
+    });
+
+    assert.rejects(
+      async () => {
+        await run();
+      },
+      { message: /invalid input received for gcloud_component: wrong_value/ },
+    );
+  });
+
+  await suite.test('throws an error if both script and command are provided', async (t) => {
+    defaultMocks(t.mock, {
+      command: 'test command',
+      script: 'test script',
+    });
+
+    assert.rejects(async () => {
       await run();
+    }, /either `command` or `script` should be set/);
+  });
 
-      const call = this.stubs.getExecOutput.getCall(0);
-      expect(call).to.be;
-      const args = call.args[1];
-      expect(args).to.include.members(['--project', 'my-test-project']);
+  await suite.test('throws an error if neither script nor command is set', async (t) => {
+    defaultMocks(t.mock, {
+      command: '',
+      script: '',
     });
 
-    it('installs the gcloud SDK if it is not already installed', async function () {
-      this.stubs.isInstalled.returns(false);
+    assert.rejects(async () => {
       await run();
-      expect(this.stubs.installGcloudSDK.callCount).to.eq(1);
+    }, /either `command` or `script` should be set/);
+  });
+
+  await suite.test('sets the correct instance name if user is provided', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      user: 'testuser',
     });
 
-    it('uses the cached gcloud SDK if it was already installed', async function () {
-      this.stubs.isInstalled.returns(true);
-      await run();
-      expect(this.stubs.installGcloudSDK.callCount).to.eq(0);
+    await run();
+
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assertMembers(args, ['testuser@hello-world-instance']);
+  });
+
+  await suite.test('sets the container if provided', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      container: 'my-test-container',
     });
 
-    it('uses default components without gcloud_component flag', async function () {
-      await run();
-      expect(this.stubs.installComponent.callCount).to.eq(0);
+    await run();
+
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assertMembers(args, ['--container', 'my-test-container']);
+  });
+
+  await suite.test('sets the temp var dir to env if provided', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      ssh_keys_dir: 'temp-dir',
     });
 
-    it('installs alpha component with alpha flag', async function () {
-      this.stubs.getInput.withArgs('gcloud_component').returns('alpha');
-      await run();
-      expect(this.stubs.installComponent.withArgs('alpha').callCount).to.eq(1);
+    await run();
+
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assertMembers(args, ['temp-dir/google_compute_engine']);
+
+    const mkdirArgs = mocks.mkdir.mock.calls?.at(0).arguments?.at(0);
+    assertMembers([mkdirArgs], ['temp-dir']);
+
+    const writeFileArgs = mocks.writeFile.mock.calls?.map((c: { arguments: string[] }) =>
+      c.arguments?.at(0),
+    );
+    assertMembers(writeFileArgs, [
+      'temp-dir/google_compute_engine',
+      'temp-dir/google_compute_engine.pub',
+    ]);
+  });
+
+  await suite.test('sets a random filepath if dir not set', async (t) => {
+    const mocks = defaultMocks(t.mock);
+
+    await run();
+
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assert.ok(args);
+  });
+
+  await suite.test('sets the correct command if script is provided', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      script: 'script-examples/script.sh',
+      command: '',
     });
 
-    it('installs beta component with beta flag', async function () {
-      this.stubs.getInput.withArgs('gcloud_component').returns('beta');
-      await run();
-      expect(this.stubs.installComponent.withArgs('beta').callCount).to.eq(1);
+    await run();
+
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assertMembers(args, [`bash -c "echo -n 1${EOL}echo -n 2${EOL}echo 3${EOL}"`]);
+  });
+
+  await suite.test('sets the correct ssh args if provided', async (t) => {
+    const mocks = defaultMocks(t.mock, {
+      ssh_args: '-vvv -L 80:%INSTANCE%:80',
     });
 
-    it('throws an error if both script and command are provided', async function () {
-      this.stubs.getInput.withArgs('script').returns('test script');
-      this.stubs.getInput.withArgs('command').returns('test command');
-      expectError(run, 'either `command` or `script` should be set');
-    });
+    await run();
 
-    it('throws an error if neither script nor command is set', async function () {
-      this.stubs.getInput.withArgs('script').returns('');
-      this.stubs.getInput.withArgs('command').returns('');
-      expectError(run, 'either `command` or `script` should be set');
-    });
-
-    it('sets the correct instance name if user is provided', async function () {
-      this.stubs.getInput.withArgs('user').returns('testuser');
-      await run();
-
-      const call = this.stubs.getExecOutput.getCall(0);
-      expect(call).to.be;
-      const args = call.args[1];
-      expect(args).to.include.members(['testuser@hello-world-instance']);
-    });
-
-    it('sets the container if provided', async function () {
-      this.stubs.getInput.withArgs('container').returns('my-test-container');
-      await run();
-
-      const call = this.stubs.getExecOutput.getCall(0);
-      expect(call).to.be;
-      const args = call.args[1];
-      expect(args).to.include.members(['--container', 'my-test-container']);
-    });
-
-    it('sets the temp var dir to env if provided', async function () {
-      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
-      await run();
-      const call = this.stubs.exportVariable.getCall(0);
-      expect(call.args[1]).to.be.equal('temp-dir');
-    });
-
-    it('sets a random filepath if dir not set', async function () {
-      await run();
-      const call = this.stubs.exportVariable.getCall(0);
-      expect(call.args[1].length).to.be.gt(0);
-    });
-
-    it('creates folder for the keys', async function () {
-      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
-      await run();
-      expect(this.stubs.mkdir.withArgs('temp-dir').callCount).to.eq(1);
-    });
-
-    it('writes private key to the folder', async function () {
-      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
-      await run();
-      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(
-        1,
-      );
-    });
-
-    it('writes public key to the folder', async function () {
-      this.stubs.getInput.withArgs('ssh_keys_dir').returns('temp-dir');
-      await run();
-      expect(this.stubs.writeFile.withArgs('temp-dir/google_compute_engine.pub').callCount).to.eq(
-        1,
-      );
-    });
-
-    it('sets the correct command if script is provided', async function () {
-      this.stubs.getInput.withArgs('command').returns('');
-      this.stubs.getInput.withArgs('script').returns('script-examples/script.sh');
-      await run();
-      const call = this.stubs.getExecOutput.getCall(0);
-      expect(call).to.be;
-      const args = call.args[1];
-      expect(args).to.include.members([`bash -c \"echo -n 1${EOL}echo -n 2${EOL}echo 3${EOL}\"`]);
-    });
-
-    it('sets the correct ssh args if provided', async function () {
-      this.stubs.getInput.withArgs('ssh_args').returns('-vvv -L 80:%INSTANCE%:80');
-      await run();
-      const call = this.stubs.getExecOutput.getCall(0);
-      expect(call).to.be;
-      const args = call.args[1];
-      expect(args).to.include.members(['-- -vvv -L 80:%INSTANCE%:80']);
-    });
+    const args = mocks.getExecOutput.mock.calls?.at(0).arguments?.at(1);
+    assertMembers(args, [`-- -vvv -L 80:%INSTANCE%:80`]);
   });
 });
-
-async function expectError(fn: () => Promise<void>, want: string) {
-  try {
-    await fn();
-    throw new Error(`expected error`);
-  } catch (err) {
-    const msg = errorMessage(err);
-    expect(msg).to.include(want);
-  }
-}
