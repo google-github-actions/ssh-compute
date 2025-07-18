@@ -29,27 +29,27 @@ jobs:
       id-token: 'write'
 
     steps:
-    - name: 'Checkout'
-      uses: 'actions/checkout@v3'
+      - name: 'Checkout'
+        uses: 'actions/checkout@v3'
 
-    # Configure Workload Identity Federation and generate an access token.
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v2'
-      with:
-        workload_identity_provider: '${{ vars.WIF_PROVIDER_NAME }}'
-        service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+      # Configure Workload Identity Federation and generate an access token.
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: '${{ vars.WIF_PROVIDER_NAME }}'
+          service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
 
-    - name: 'SSH to GCP instance'
-      id: 'ssh'
-      uses: 'google-github-actions/ssh-compute@v1'
-      with:
-        instance_name: 'instance-name'
-        zone: '${{ env.ZONE }}'
-        ssh_private_key: '${{ secrets.VM_PRIVATE_KEY }}'
-        script: '${{ github.workspace }}/script-examples/script.sh'
+      - name: 'SSH to GCP instance'
+        id: 'ssh'
+        uses: 'google-github-actions/ssh-compute@v1'
+        with:
+          instance_name: 'instance-name'
+          zone: '${{ env.ZONE }}'
+          ssh_private_key: '${{ secrets.VM_PRIVATE_KEY }}'
+          script: '${{ github.workspace }}/script-examples/script.sh'
 
-    - name: 'Show Output'
-      run: |-
-        echo '${{ steps.ssh.outputs.stdout }}'
-        echo '${{ steps.ssh.outputs.stderr }}'
+      - name: 'Show Output'
+        run: |-
+          echo '${{ steps.ssh.outputs.stdout }}'
+          echo '${{ steps.ssh.outputs.stderr }}'

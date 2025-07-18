@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: SSH to Google Cloud Platform compute instances
-author: Google LLC
+name: 'SSH to Google Cloud Platform compute instances'
+author: 'Google LLC'
 description: |-
-  Use this action to connect to Google Cloud Platform instances via ssh and execute user's commands.
+  Use this action to connect to Google Cloud Platform instances via ssh and
+  execute user's commands.
 
 inputs:
   instance_name:
@@ -71,7 +72,8 @@ inputs:
     required: false
 
   project_id:
-    description: The GCP project ID. Overrides project ID set by credentials.
+    description: |-
+      The GCP project ID. Overrides project ID set by credentials.
     required: false
 
   flags:
@@ -97,9 +99,11 @@ inputs:
 
 outputs:
   stdout:
-    description: Stdout from ssh command.
+    description: |-
+      Stdout from ssh command.
   stderr:
-    description: Stderr from ssh command.
+    description: |-
+      Stderr from ssh command.
 
 branding:
   icon: 'terminal'
