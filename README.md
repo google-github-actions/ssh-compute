@@ -40,13 +40,13 @@ jobs:
     - uses: 'actions/checkout@v4'
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v2'
+      uses: 'google-github-actions/auth@v3'
       with:
         workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
 
     - id: 'compute-ssh'
-      uses: 'google-github-actions/ssh-compute@v1'
+      uses: 'google-github-actions/ssh-compute@v2'
       with:
         instance_name: 'example-instance'
         zone: 'us-central1-a'
@@ -104,13 +104,13 @@ jobs:
     - uses: 'actions/checkout@v4'
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v2'
+      uses: 'google-github-actions/auth@v3'
       with:
         workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
 
     - id: 'compute-ssh'
-      uses: 'google-github-actions/ssh-compute@v1'
+      uses: 'google-github-actions/ssh-compute@v2'
       with:
         instance_name: 'example-instance'
         zone: 'us-central1-a'
@@ -127,12 +127,12 @@ jobs:
     - uses: 'actions/checkout@v4'
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v2'
+      uses: 'google-github-actions/auth@v3'
       with:
         credentials_json: '${{ secrets.gcp_credentials }}'
 
     - id: 'compute-ssh'
-      uses: 'google-github-actions/ssh-compute@v1'
+      uses: 'google-github-actions/ssh-compute@v2'
       with:
         instance_name: 'example-instance'
         zone: 'us-central1-a'
@@ -154,7 +154,7 @@ jobs:
     - uses: 'actions/checkout@v4'
 
     - id: 'compute-ssh'
-      uses: 'google-github-actions/ssh-compute@v1'
+      uses: 'google-github-actions/ssh-compute@v2'
       with:
         instance_name: 'example-instance'
         zone: 'us-central1-a'
